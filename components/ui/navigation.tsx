@@ -4,8 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Home, Code2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Home, Code2, Github } from 'lucide-react';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -23,28 +22,17 @@ export function Navigation() {
         </Button>
       </Link>
       
-      <Link href="/docs">
-        <Button
-          variant={pathname === '/docs' ? 'default' : 'outline'}
-          size="sm"
-          className="glass shadow-lg"
-        >
-          <BookOpen className="h-4 w-4 mr-2" />
-          API Docs
-          <Badge variant="secondary" className="ml-2 text-xs">
-            OpenAPI
-          </Badge>
-        </Button>
-      </Link>
-      
       <Button
         variant="outline"
         size="sm"
         className="glass shadow-lg"
         onClick={() => window.open('https://github.com/your-username/converthub', '_blank')}
       >
-        <Code2 className="h-4 w-4 mr-2" />
+        <Github className="h-4 w-4 mr-2" />
         GitHub
+        <Badge variant="secondary" className="ml-2 text-xs">
+          Open Source
+        </Badge>
       </Button>
     </nav>
   );

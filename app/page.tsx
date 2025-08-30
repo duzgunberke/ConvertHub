@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Search, Menu, Copy, Check, RotateCcw, Upload, AlertCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +30,8 @@ export default function Home() {
     ...category,
     converters: category.converters.filter(converter =>
       converter.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      converter.description.toLowerCase().includes(searchQuery.toLowerCase())
+      converter.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      converter.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
     )
   })).filter(category => category.converters.length > 0);
 
@@ -43,7 +44,7 @@ export default function Home() {
     try {
       const result = await convertWithId(selectedConverter.id, inputValue);
       
-      if (result?.success && result.output) {
+      if (result?.success && result.output !== undefined) {
         setOutputValue(result.output);
         setConversionResult(result);
         toast.success("Conversion completed successfully");
@@ -101,16 +102,19 @@ export default function Home() {
     reader.readAsText(file);
   };
 
-  // Auto-convert on converter change (optional)
-  useEffect(() => {
-    if (inputValue.trim() && !loading) {
-      const timeoutId = setTimeout(() => {
-        handleConvert();
-      }, 1000); // Auto-convert after 1 second of inactivity
+  const handleConverterSelect = (converter: Converter) => {
+    setSelectedConverter(converter);
+    // Clear outputs when switching converter
+    setOutputValue("");
+    setConversionResult(null);
+  };
 
-      return () => clearTimeout(timeoutId);
+  const handleCategorySelect = (category: Category) => {
+    setSelectedCategory(category);
+    if (category.converters.length > 0) {
+      handleConverterSelect(category.converters[0]);
     }
-  }, [selectedConverter.id, inputValue, loading, handleConvert]);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/5 flex overflow-hidden">
@@ -120,8 +124,8 @@ export default function Home() {
         selectedCategory={selectedCategory}
         selectedConverter={selectedConverter}
         isOpen={sidebarOpen}
-        onCategorySelect={setSelectedCategory}
-        onConverterSelect={setSelectedConverter}
+        onCategorySelect={handleCategorySelect}
+        onConverterSelect={handleConverterSelect}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />
 
@@ -150,7 +154,7 @@ export default function Home() {
 
           <div className="text-sm text-muted-foreground hidden md:flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
-              API Powered
+              {categories.reduce((total, cat) => total + cat.count, 0)} Tools
             </Badge>
             <span className="font-medium">{selectedConverter.name}</span>
           </div>
@@ -335,7 +339,7 @@ export default function Home() {
                     <ConverterCard
                       key={converter.id}
                       converter={converter}
-                      onClick={() => setSelectedConverter(converter)}
+                      onClick={() => handleConverterSelect(converter)}
                     />
                   ))}
               </div>

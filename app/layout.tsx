@@ -16,12 +16,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ConvertHub - Professional Developer Tools",
-  description: "A powerful platform for text conversion, encoding, hashing and data transformation. Built for developers by developers.",
-  keywords: "base64, encoding, hash, converter, developer tools, api",
+  description: "A powerful platform for text conversion, encoding, hashing and data transformation. Over 25+ conversion tools for developers.",
+  keywords: "base64, encoding, hash, converter, developer tools, text transform, url encode, json format",
   authors: [{ name: "ConvertHub Team" }],
   openGraph: {
     title: "ConvertHub - Professional Developer Tools",
-    description: "Powerful conversion tools with comprehensive API",
+    description: "25+ powerful conversion tools for developers - Base64, hashing, encoding, and more",
     type: "website",
   },
 };

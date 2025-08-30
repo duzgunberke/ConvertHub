@@ -1,3 +1,4 @@
+// models/converter.ts
 export interface Converter {
   id: string;
   name: string;
@@ -21,8 +22,8 @@ export const categories: Category[] = [
     id: "text-encoding",
     name: "Text & Encoding",
     icon: "📝",
-    description: "Base64, URL, HTML, ciphers, transformations",
-    count: 40,
+    description: "Base64, URL, HTML, text transformations",
+    count: 10,
     converters: [
       {
         id: "base64-encode",
@@ -66,6 +67,34 @@ export const categories: Category[] = [
         description: "Decode HTML entities",
         category: "text-encoding",
         tags: ["html", "decode", "web"]
+      },
+      {
+        id: "text-uppercase",
+        name: "Text Uppercase",
+        description: "Convert text to uppercase",
+        category: "text-encoding",
+        tags: ["text", "uppercase", "case"]
+      },
+      {
+        id: "text-lowercase",
+        name: "Text Lowercase",
+        description: "Convert text to lowercase",
+        category: "text-encoding",
+        tags: ["text", "lowercase", "case"]
+      },
+      {
+        id: "text-capitalize",
+        name: "Text Capitalize",
+        description: "Capitalize first letter of each word",
+        category: "text-encoding",
+        tags: ["text", "capitalize", "case"]
+      },
+      {
+        id: "text-reverse",
+        name: "Text Reverse",
+        description: "Reverse text characters",
+        category: "text-encoding",
+        tags: ["text", "reverse"]
       }
     ]
   },
@@ -73,8 +102,8 @@ export const categories: Category[] = [
     id: "cryptography",
     name: "Cryptography",
     icon: "🔐",
-    description: "All hash types, HMAC, modern crypto",
-    count: 35,
+    description: "Hash functions, HMAC, crypto operations",
+    count: 5,
     converters: [
       {
         id: "hash-md5",
@@ -99,8 +128,15 @@ export const categories: Category[] = [
         tags: ["hash", "sha256", "crypto"]
       },
       {
-        id: "hmac-generator",
-        name: "HMAC Generator",
+        id: "hash-sha512",
+        name: "SHA512 Hash",
+        description: "Generate SHA512 hash",
+        category: "cryptography",
+        tags: ["hash", "sha512", "crypto"]
+      },
+      {
+        id: "hmac-sha256",
+        name: "HMAC-SHA256",
         description: "Generate HMAC with secret key",
         category: "cryptography",
         tags: ["hmac", "hash", "crypto"]
@@ -111,15 +147,30 @@ export const categories: Category[] = [
     id: "numbers-math",
     name: "Numbers & Math",
     icon: "🔢",
-    description: "Base conversions, bitwise, calculations",
-    count: 25,
+    description: "Base conversions, number operations",
+    count: 4,
     converters: [
       {
         id: "decimal-to-binary",
         name: "Decimal to Binary",
         description: "Convert decimal numbers to binary",
         category: "numbers-math",
-        tags: ["decimal", "binary", "conversion"]
+        tags: ["decimal", "binary", "conversion"],
+        featured: true
+      },
+      {
+        id: "binary-to-decimal",
+        name: "Binary to Decimal",
+        description: "Convert binary numbers to decimal",
+        category: "numbers-math",
+        tags: ["binary", "decimal", "conversion"]
+      },
+      {
+        id: "decimal-to-hex",
+        name: "Decimal to Hex",
+        description: "Convert decimal numbers to hexadecimal",
+        category: "numbers-math",
+        tags: ["decimal", "hex", "conversion"]
       },
       {
         id: "hex-to-decimal",
@@ -127,13 +178,6 @@ export const categories: Category[] = [
         description: "Convert hexadecimal to decimal",
         category: "numbers-math",
         tags: ["hex", "decimal", "conversion"]
-      },
-      {
-        id: "binary-calculator",
-        name: "Binary Calculator",
-        description: "Perform binary arithmetic operations",
-        category: "numbers-math",
-        tags: ["binary", "calculator", "math"]
       }
     ]
   },
@@ -141,29 +185,23 @@ export const categories: Category[] = [
     id: "colors-design",
     name: "Colors & Design",
     icon: "🎨",
-    description: "Color spaces, palette generation",
-    count: 20,
+    description: "Color space conversions",
+    count: 2,
     converters: [
       {
         id: "hex-to-rgb",
         name: "Hex to RGB",
         description: "Convert hex colors to RGB",
         category: "colors-design",
-        tags: ["color", "hex", "rgb"]
+        tags: ["color", "hex", "rgb"],
+        featured: true
       },
       {
-        id: "rgb-to-hsl",
-        name: "RGB to HSL",
-        description: "Convert RGB to HSL color space",
+        id: "rgb-to-hex",
+        name: "RGB to Hex",
+        description: "Convert RGB colors to hex",
         category: "colors-design",
-        tags: ["color", "rgb", "hsl"]
-      },
-      {
-        id: "color-palette",
-        name: "Color Palette Generator",
-        description: "Generate harmonious color palettes",
-        category: "colors-design",
-        tags: ["color", "palette", "design"]
+        tags: ["color", "rgb", "hex"]
       }
     ]
   },
@@ -171,22 +209,23 @@ export const categories: Category[] = [
     id: "time-date",
     name: "Time & Date",
     icon: "⏰",
-    description: "Timestamps, timezone conversions",
-    count: 15,
+    description: "Timestamp and date conversions",
+    count: 2,
     converters: [
       {
-        id: "timestamp-converter",
-        name: "Timestamp Converter",
-        description: "Convert between timestamps and dates",
+        id: "timestamp-to-date",
+        name: "Timestamp to Date",
+        description: "Convert Unix timestamp to date",
         category: "time-date",
-        tags: ["timestamp", "date", "time"]
+        tags: ["timestamp", "date", "unix"],
+        featured: true
       },
       {
-        id: "timezone-converter",
-        name: "Timezone Converter",
-        description: "Convert times between timezones",
+        id: "date-to-timestamp",
+        name: "Date to Timestamp",
+        description: "Convert date to Unix timestamp",
         category: "time-date",
-        tags: ["timezone", "time", "convert"]
+        tags: ["date", "timestamp", "unix"]
       }
     ]
   },
@@ -194,8 +233,8 @@ export const categories: Category[] = [
     id: "data-formats",
     name: "Data Formats",
     icon: "📄",
-    description: "JSON/YAML/XML, web formats, code minify",
-    count: 30,
+    description: "JSON, XML, YAML formatting",
+    count: 2,
     converters: [
       {
         id: "json-format",
@@ -206,71 +245,11 @@ export const categories: Category[] = [
         featured: true
       },
       {
-        id: "yaml-to-json",
-        name: "YAML to JSON",
-        description: "Convert YAML to JSON format",
+        id: "json-minify",
+        name: "JSON Minifier",
+        description: "Minify JSON by removing whitespace",
         category: "data-formats",
-        tags: ["yaml", "json", "convert"]
-      },
-      {
-        id: "xml-format",
-        name: "XML Formatter",
-        description: "Format and validate XML",
-        category: "data-formats",
-        tags: ["xml", "format", "validate"]
-      },
-      {
-        id: "css-minifier",
-        name: "CSS Minifier",
-        description: "Minify CSS code",
-        category: "data-formats",
-        tags: ["css", "minify", "optimize"]
-      }
-    ]
-  },
-  {
-    id: "images-media",
-    name: "Images & Media",
-    icon: "🖼️",
-    description: "QR codes, barcodes, Base64 images",
-    count: 20,
-    converters: [
-      {
-        id: "qr-generator",
-        name: "QR Code Generator",
-        description: "Generate QR codes from text",
-        category: "images-media",
-        tags: ["qr", "code", "generate"]
-      },
-      {
-        id: "image-to-base64",
-        name: "Image to Base64",
-        description: "Convert images to Base64 strings",
-        category: "images-media",
-        tags: ["image", "base64", "convert"]
-      }
-    ]
-  },
-  {
-    id: "network-web",
-    name: "Network & Web",
-    icon: "🌐",
-    description: "IP analysis, domain validation",
-    count: 20,
-    converters: [
-      {
-        id: "ip-lookup",
-        name: "IP Address Lookup",
-        description: "Get information about IP addresses",
-        category: "network-web",
-        tags: ["ip", "lookup", "network"]
-      },
-      {
-        id: "domain-validator",
-        name: "Domain Validator",
-        description: "Validate domain names",
-        category: "network-web",
-        tags: ["domain", "validate", "web"]
+        tags: ["json", "minify", "compress"]
       }
     ]
   },
@@ -278,29 +257,30 @@ export const categories: Category[] = [
     id: "generators",
     name: "Generators",
     icon: "🎲",
-    description: "UUIDs, passwords, fake data",
-    count: 25,
+    description: "UUID, password, text generators",
+    count: 3,
     converters: [
       {
-        id: "uuid-generator",
+        id: "uuid-generate",
         name: "UUID Generator",
         description: "Generate unique identifiers",
         category: "generators",
-        tags: ["uuid", "generate", "unique"]
+        tags: ["uuid", "generate", "unique"],
+        featured: true
       },
       {
-        id: "password-generator",
+        id: "password-generate",
         name: "Password Generator",
         description: "Generate secure passwords",
         category: "generators",
         tags: ["password", "generate", "secure"]
       },
       {
-        id: "lorem-generator",
+        id: "lorem-generate",
         name: "Lorem Ipsum Generator",
         description: "Generate placeholder text",
         category: "generators",
-        tags: ["lorem", "text", "placeholder"]
+        tags: ["lorem", "ipsum", "placeholder"]
       }
     ]
   }

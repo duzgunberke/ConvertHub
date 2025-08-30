@@ -1,41 +1,57 @@
 // lib/converter-registry.ts
 import { BaseConverter } from '@/types/converter';
 
-// Text Encoding Converters
+// Import all converters
 import {
+  // Text & Encoding
   Base64EncodeConverter,
   Base64DecodeConverter,
   URLEncodeConverter,
   URLDecodeConverter,
   HTMLEncodeConverter,
   HTMLDecodeConverter,
-} from './converters/text-encoding';
+  TextUppercaseConverter,
+  TextLowercaseConverter,
+  TextCapitalizeConverter,
+  TextReverseConverter,
 
-// Cryptography Converters
-import {
+  // Cryptography
   MD5HashConverter,
   SHA1HashConverter,
   SHA256HashConverter,
   SHA512HashConverter,
-  HMACGeneratorConverter,
-  BCryptHashConverter,
-} from './converters/cryptography';
+  HMACConverter,
 
-// Data Format Converters
-import {
+  // Numbers & Math
+  DecimalToBinaryConverter,
+  BinaryToDecimalConverter,
+  DecimalToHexConverter,
+  HexToDecimalConverter,
+
+  // Colors & Design
+  HexToRGBConverter,
+  RGBToHexConverter,
+
+  // Time & Date
+  TimestampToDateConverter,
+  DateToTimestampConverter,
+
+  // Data Formats
   JSONFormatterConverter,
   JSONMinifyConverter,
-  YAMLToJSONConverter,
-  JSONToYAMLConverter,
-  XMLFormatterConverter,
-} from './converters/data-formats';
+
+  // Generators
+  UUIDGeneratorConverter,
+  PasswordGeneratorConverter,
+  LoremGeneratorConverter,
+} from './converters/all-converters';
 
 export class ConverterRegistry {
   private static instance: ConverterRegistry;
   private converters: Map<string, BaseConverter> = new Map();
 
   private constructor() {
-    this.registerDefaultConverters();
+    this.registerAllConverters();
   }
 
   static getInstance(): ConverterRegistry {
@@ -45,29 +61,52 @@ export class ConverterRegistry {
     return ConverterRegistry.instance;
   }
 
-  private registerDefaultConverters() {
-    // Text Encoding
-    this.register(new Base64EncodeConverter());
-    this.register(new Base64DecodeConverter());
-    this.register(new URLEncodeConverter());
-    this.register(new URLDecodeConverter());
-    this.register(new HTMLEncodeConverter());
-    this.register(new HTMLDecodeConverter());
+  private registerAllConverters() {
+    const converters = [
+      // Text & Encoding
+      new Base64EncodeConverter(),
+      new Base64DecodeConverter(),
+      new URLEncodeConverter(),
+      new URLDecodeConverter(),
+      new HTMLEncodeConverter(),
+      new HTMLDecodeConverter(),
+      new TextUppercaseConverter(),
+      new TextLowercaseConverter(),
+      new TextCapitalizeConverter(),
+      new TextReverseConverter(),
 
-    // Cryptography
-    this.register(new MD5HashConverter());
-    this.register(new SHA1HashConverter());
-    this.register(new SHA256HashConverter());
-    this.register(new SHA512HashConverter());
-    this.register(new HMACGeneratorConverter());
-    this.register(new BCryptHashConverter());
+      // Cryptography
+      new MD5HashConverter(),
+      new SHA1HashConverter(),
+      new SHA256HashConverter(),
+      new SHA512HashConverter(),
+      new HMACConverter(),
 
-    // Data Formats
-    this.register(new JSONFormatterConverter());
-    this.register(new JSONMinifyConverter());
-    this.register(new YAMLToJSONConverter());
-    this.register(new JSONToYAMLConverter());
-    this.register(new XMLFormatterConverter());
+      // Numbers & Math
+      new DecimalToBinaryConverter(),
+      new BinaryToDecimalConverter(),
+      new DecimalToHexConverter(),
+      new HexToDecimalConverter(),
+
+      // Colors & Design
+      new HexToRGBConverter(),
+      new RGBToHexConverter(),
+
+      // Time & Date
+      new TimestampToDateConverter(),
+      new DateToTimestampConverter(),
+
+      // Data Formats
+      new JSONFormatterConverter(),
+      new JSONMinifyConverter(),
+
+      // Generators
+      new UUIDGeneratorConverter(),
+      new PasswordGeneratorConverter(),
+      new LoremGeneratorConverter(),
+    ];
+
+    converters.forEach(converter => this.register(converter));
   }
 
   register(converter: BaseConverter): void {
