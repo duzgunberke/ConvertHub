@@ -5,10 +5,10 @@ import { ConversionRequest } from '@/types/converter';
 
 export async function POST(
   request: NextRequest, 
-  { params }: { params: { converterId: string } }
+  context: { params: Promise<{ converterId: string }> }
 ) {
   try {
-    const { converterId } = params;
+    const { converterId } = await context.params;
     const body = await request.json();
     
     // Validate request
@@ -43,7 +43,8 @@ export async function POST(
     return NextResponse.json(result, { status });
     
   } catch (error) {
-    console.error(`Conversion API error for ${params.converterId}:`, error);
+    const { converterId } = await context.params;
+    console.error(`Conversion API error for ${converterId}:`, error);
     
     return NextResponse.json({
       success: false,
@@ -54,10 +55,10 @@ export async function POST(
 
 export async function GET(
   request: NextRequest, 
-  { params }: { params: { converterId: string } }
+  context: { params: Promise<{ converterId: string }> }
 ) {
   try {
-    const { converterId } = params;
+    const { converterId } = await context.params;
     
     // Get converter
     const converter = converterRegistry.get(converterId);
@@ -80,7 +81,8 @@ export async function GET(
     });
     
   } catch (error) {
-    console.error(`Get converter API error for ${params.converterId}:`, error);
+    const { converterId } = await context.params;
+    console.error(`Get converter API error for ${converterId}:`, error);
     
     return NextResponse.json({
       success: false,
