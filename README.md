@@ -1,247 +1,175 @@
-# ConvertHub API Documentation
+# ConvertHub - Professional Developer Tools
 
-## Overview
+<div align="center">
 
-ConvertHub provides a powerful REST API for text and data conversion operations. The API is built with Next.js and supports various encoding, cryptography, and data format conversions.
+![ConvertHub Logo](https://via.placeholder.com/200x80/4F46E5/FFFFFF?text=ConvertHub)
 
-## Base URL
+**A powerful, modern platform for text conversion, encoding, hashing and data transformation**
 
+[![Next.js](https://img.shields.io/badge/Next.js-15.5.2-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.0-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+[Live Demo](https://converthub.vercel.app) • [API Documentation](#api-documentation) • [Contributing](#contributing)
+
+</div>
+
+## 🚀 Features
+
+### Current Tools (25+ Converters)
+
+#### 📝 Text & Encoding
+- **Base64** - Encode/decode text to Base64 format
+- **URL Encoding** - Encode/decode URLs for web usage
+- **HTML Entities** - Encode/decode special HTML characters
+- **Text Transformations** - Uppercase, lowercase, capitalize, reverse
+
+#### 🔐 Cryptography
+- **Hash Functions** - MD5, SHA1, SHA256, SHA512
+- **HMAC** - Generate HMAC with secret keys
+- **Secure Hashing** - Professional-grade cryptographic operations
+
+#### 🔢 Numbers & Math
+- **Base Conversions** - Decimal ↔ Binary ↔ Hexadecimal
+- **Number Systems** - Convert between different numeral systems
+
+#### 🎨 Colors & Design
+- **Color Conversions** - Hex ↔ RGB transformations
+- **Design Tools** - Color format conversions for developers
+
+#### ⏰ Time & Date
+- **Timestamp Conversions** - Unix timestamp ↔ Human readable dates
+- **Date Formatting** - Multiple date format support
+
+#### 📄 Data Formats
+- **JSON Tools** - Format, validate, and minify JSON
+- **Data Parsing** - Structure and validate data formats
+
+#### 🎲 Generators
+- **UUID Generator** - Generate unique identifiers (v4)
+- **Password Generator** - Create secure passwords
+- **Lorem Ipsum** - Generate placeholder text
+
+### 🎯 Core Features
+
+- **🚀 Fast & Responsive** - Built with Next.js 15 and optimized performance
+- **🎨 Modern UI** - Beautiful glassmorphism design with premium animations
+- **📱 Mobile First** - Fully responsive across all devices
+- **⚡ Real-time Processing** - Instant conversion with live feedback
+- **📋 Smart Copy** - One-click copy to clipboard
+- **📁 File Upload** - Support for text file uploads (up to 10MB)
+- **🔍 Smart Search** - Find converters by name, description, or tags
+- **📊 Detailed Metadata** - Processing time, character counts, and more
+- **🌙 Dark Theme** - Professional dark mode interface
+- **🔧 Developer Friendly** - REST API for programmatic access
+
+## 📦 Installation
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+
+### Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/converthub.git
+cd converthub
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Open http://localhost:3000
+```
+
+### Build for Production
+
+```bash
+# Create optimized build
+npm run build
+
+# Start production server
+npm start
+```
+
+## 🏗️ Project Structure
+
+```
+converthub/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   │   ├── categories/    # Category endpoints
+│   │   ├── convert/       # Conversion endpoints
+│   │   └── search/        # Search endpoints
+│   ├── globals.css        # Global styles & design system
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Main converter interface
+├── components/            # React components
+│   ├── convert/          # Conversion-specific components
+│   └── ui/               # Reusable UI components
+├── lib/                  # Core libraries
+│   ├── converters/       # Converter implementations
+│   ├── converter-registry.ts # Converter management
+│   └── api-client.ts     # API client & hooks
+├── models/               # Data models
+├── types/                # TypeScript definitions
+└── public/               # Static assets
+```
+
+## 🔧 Technology Stack
+
+### Frontend
+- **Next.js 15** - React framework with App Router
+- **React 19** - Modern React with hooks
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first CSS framework
+- **Radix UI** - Headless UI primitives
+- **Lucide React** - Beautiful icons
+- **Sonner** - Toast notifications
+
+### Backend
+- **Next.js API Routes** - Serverless API endpoints
+- **Node.js Crypto** - Built-in cryptographic operations
+- **TypeScript** - End-to-end type safety
+
+### Development Tools
+- **ESLint** - Code linting
+- **Prettier** - Code formatting
+- **PostCSS** - CSS processing
+
+## 📡 API Documentation
+
+ConvertHub provides a comprehensive REST API for programmatic access:
+
+### Base URL
 ```
 https://yourdomain.com/api
 ```
 
-## Endpoints
-
-### 1. Convert Text
-
-**POST** `/api/convert`
-
-Convert text using any supported converter.
-
-#### Request Body
-```json
-{
-  "input": "Hello World",
-  "converterId": "base64-encode",
-  "options": {
-    "indent": 2
-  }
-}
-```
-
-#### Response
-```json
-{
-  "success": true,
-  "output": "SGVsbG8gV29ybGQ=",
-  "metadata": {
-    "inputLength": 11,
-    "outputLength": 16,
-    "processingTime": 2,
-    "converterId": "base64-encode"
-  }
-}
-```
-
-### 2. Convert with Specific Converter
-
-**POST** `/api/convert/{converterId}`
-
-Convert text using a specific converter ID.
-
-#### URL Parameters
-- `converterId` - The ID of the converter to use
-
-#### Request Body
-```json
-{
-  "input": "Hello World",
-  "options": {
-    "algorithm": "sha256"
-  }
-}
-```
-
-### 3. Get All Converters
-
-**GET** `/api/convert`
-
-Get a list of all available converters.
-
-#### Response
-```json
-{
-  "success": true,
-  "data": {
-    "stats": {
-      "total": 15,
-      "categories": 3,
-      "byCategory": {
-        "text-encoding": 6,
-        "cryptography": 6,
-        "data-formats": 3
-      }
-    },
-    "converters": [
-      {
-        "id": "base64-encode",
-        "name": "Base64 Encode",
-        "description": "Encode text to Base64 format",
-        "category": "text-encoding",
-        "tags": ["base64", "encode", "text"]
-      }
-    ]
-  }
-}
-```
-
-### 4. Get Specific Converter
-
-**GET** `/api/convert/{converterId}`
-
-Get information about a specific converter.
-
-#### Response
-```json
-{
-  "success": true,
-  "data": {
-    "id": "base64-encode",
-    "name": "Base64 Encode",
-    "description": "Encode text to Base64 format",
-    "category": "text-encoding",
-    "tags": ["base64", "encode", "text"]
-  }
-}
-```
-
-### 5. Get Categories
-
-**GET** `/api/categories`
-
-Get all converter categories with their converters.
-
-#### Response
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "text-encoding",
-      "name": "Text & Encoding",
-      "converters": [...],
-      "count": 6
-    }
-  ]
-}
-```
-
-### 6. Search Converters
-
-**GET** `/api/search?q={query}`
-
-Search for converters by name, description, or tags.
-
-#### Query Parameters
-- `q` - Search query string
-
-#### Response
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "base64-encode",
-      "name": "Base64 Encode",
-      "description": "Encode text to Base64 format",
-      "category": "text-encoding",
-      "tags": ["base64", "encode", "text"]
-    }
-  ],
-  "meta": {
-    "query": "base64",
-    "resultCount": 2
-  }
-}
-```
-
-## Supported Converters
-
-### Text Encoding
-- `base64-encode` - Base64 Encode
-- `base64-decode` - Base64 Decode
-- `url-encode` - URL Encode
-- `url-decode` - URL Decode
-- `html-encode` - HTML Encode
-- `html-decode` - HTML Decode
-
-### Cryptography
-- `hash-md5` - MD5 Hash
-- `hash-sha1` - SHA1 Hash
-- `hash-sha256` - SHA256 Hash
-- `hash-sha512` - SHA512 Hash
-- `hmac-generator` - HMAC Generator
-- `bcrypt-hash` - BCrypt Hash
-
-### Data Formats
-- `json-format` - JSON Formatter
-- `json-minify` - JSON Minifier
-- `yaml-to-json` - YAML to JSON
-- `json-to-yaml` - JSON to YAML
-- `xml-format` - XML Formatter
-
-## Error Handling
-
-All endpoints return consistent error responses:
-
-```json
-{
-  "success": false,
-  "error": "Error description",
-  "metadata": {
-    "inputLength": 0,
-    "outputLength": 0,
-    "processingTime": 0,
-    "converterId": "unknown"
-  }
-}
-```
-
-## Rate Limiting
-
-- 100 requests per minute per IP
-- Larger inputs (>1MB) have lower rate limits
-- Premium users get higher limits
-
-## Authentication
-
-Currently, the API is open and doesn't require authentication. In production, consider implementing:
-
-- API Keys
-- JWT tokens
-- Rate limiting by user
-
-## Examples
-
-### Using cURL
+### Key Endpoints
 
 ```bash
-# Convert to Base64
-curl -X POST https://yourdomain.com/api/convert \
-  -H "Content-Type: application/json" \
-  -d '{"input": "Hello World", "converterId": "base64-encode"}'
+# Convert text
+POST /api/convert
+POST /api/convert/{converterId}
 
-# Get all converters
-curl https://yourdomain.com/api/convert
+# Get converters
+GET /api/convert
+GET /api/convert/{converterId}
 
-# Search converters
-curl "https://yourdomain.com/api/search?q=base64"
+# Categories and search
+GET /api/categories
+GET /api/search?q={query}
 ```
 
-### Using JavaScript
+### Example Usage
 
 ```javascript
-// Convert text
+// Convert to Base64
 const response = await fetch('/api/convert', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -255,25 +183,124 @@ const result = await response.json();
 console.log(result.output); // SGVsbG8gV29ybGQ=
 ```
 
-### Using Python
+[View Complete API Documentation →](./API.md)
 
-```python
-import requests
+## 🚀 Deployment
 
-# Convert text
-response = requests.post('https://yourdomain.com/api/convert', json={
-    'input': 'Hello World',
-    'converterId': 'base64-encode'
-})
-
-result = response.json()
-print(result['output'])  # SGVsbG8gV29ybGQ=
+### Vercel (Recommended)
+```bash
+# Deploy to Vercel
+npm i -g vercel
+vercel --prod
 ```
 
-## Status Codes
+### Other Platforms
+- **Netlify** - `npm run build && npm run export`
+- **Docker** - Dockerfile included
+- **Traditional Hosting** - Static export supported
 
-- `200` - Success
-- `400` - Bad Request (invalid input)
-- `404` - Not Found (converter not found)
-- `429` - Too Many Requests (rate limited)
-- `500` - Internal Server Error
+## 🛠️ Potential Enhancements
+
+### High Priority
+- [ ] **More Converters**
+  - CSS/SCSS/LESS transformations
+  - SQL formatters and validators
+  - Regular expression testing
+  - Unicode/ASCII converters
+  - QR code generation
+
+- [ ] **File Format Support**
+  - CSV ↔ JSON ↔ XML conversions
+  - YAML ↔ TOML ↔ INI
+  - Image format conversions
+  - PDF text extraction
+
+- [ ] **Advanced Features**
+  - Batch processing multiple inputs
+  - Conversion history and favorites
+  - Custom converter plugins
+  - Template/preset management
+
+### Medium Priority
+- [ ] **Developer Experience**
+  - CLI tool for terminal usage
+  - Browser extension
+  - VS Code extension
+  - Desktop app (Electron)
+
+- [ ] **Collaboration Features**
+  - User accounts and profiles
+  - Shared converter collections
+  - Team workspaces
+  - Public converter gallery
+
+### Nice to Have
+- [ ] **Analytics & Insights**
+  - Usage analytics dashboard
+  - Performance monitoring
+  - Conversion statistics
+  - Popular tools tracking
+
+- [ ] **Enterprise Features**
+  - API rate limiting and keys
+  - Custom branding
+  - SSO integration
+  - Audit logs
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how to get started:
+
+### Development Setup
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-converter`)
+3. Make your changes
+4. Add tests if applicable
+5. Commit changes (`git commit -m 'Add amazing converter'`)
+6. Push to branch (`git push origin feature/amazing-converter`)
+7. Open a Pull Request
+
+### Adding New Converters
+
+```typescript
+// lib/converters/my-converter.ts
+export class MyConverter extends BaseConverter {
+  id = 'my-converter';
+  name = 'My Converter';
+  description = 'Does something amazing';
+  category = 'text-encoding';
+  tags = ['custom', 'transform'];
+
+  async convert(input: string): Promise<string> {
+    // Your conversion logic here
+    return input.toUpperCase();
+  }
+}
+```
+
+### Guidelines
+- Follow TypeScript best practices
+- Add proper error handling
+- Include validation where needed
+- Write clear documentation
+- Test your converters thoroughly
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/) - The React framework
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
+- [Radix UI](https://www.radix-ui.com/) - Headless UI components
+- [Lucide](https://lucide.dev/) - Beautiful icons
+
+
+<div align="center">
+
+**Made with ❤️ for developers, by developers**
+
+[⭐ Star this repo](https://github.com/duzgunberke/converthub)
+
+</div>
