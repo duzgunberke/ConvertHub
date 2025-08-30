@@ -98,14 +98,14 @@ export const CategorySidebar = ({
                 return (
                   <div key={category.id} className="space-y-2">
                     {/* Category Header */}
-                    <button
-                      onClick={() => handleCategorySelect(category)}
-                      className={cn(
-                        "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 text-left group hover:bg-muted/60 hover:shadow-md",
-                        isSelected && "bg-primary/10 shadow-lg ring-1 ring-primary/20"
-                      )}
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="relative">
+                      <button
+                        onClick={() => handleCategorySelect(category)}
+                        className={cn(
+                          "w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-left group hover:bg-muted/60 hover:shadow-md",
+                          isSelected && "bg-primary/10 shadow-lg ring-1 ring-primary/20"
+                        )}
+                      >
                         <span className="text-xl flex-shrink-0">{category.icon}</span>
                         <div className="flex-1 min-w-0">
                           <div className={cn(
@@ -118,28 +118,29 @@ export const CategorySidebar = ({
                             {category.converters.length} tools
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                          {category.converters.length}
-                        </Badge>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleCategory(category.id);
-                          }}
-                          className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
-                        >
-                          {isExpanded ? (
-                            <ChevronDown className="h-3 w-3" />
-                          ) : (
-                            <ChevronRight className="h-3 w-3" />
-                          )}
-                        </Button>
-                      </div>
-                    </button>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                            {category.converters.length}
+                          </Badge>
+                        </div>
+                      </button>
+                      
+                      {/* Separate toggle button */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleCategory(category.id);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center rounded-md hover:bg-muted/40 transition-colors opacity-60 hover:opacity-100"
+                      >
+                        {isExpanded ? (
+                          <ChevronDown className="h-3 w-3" />
+                        ) : (
+                          <ChevronRight className="h-3 w-3" />
+                        )}
+                      </button>
+                    </div>
 
                     {/* Converters List */}
                     {isExpanded && (

@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { ArrowRight, Star } from "lucide-react";
 import { Converter } from "@/models/converter";
 
@@ -12,7 +11,7 @@ interface ConverterCardProps {
 export const ConverterCard = ({ converter, onClick }: ConverterCardProps) => {
   return (
     <Card 
-      className="p-6 glass hover:shadow-glow transition-all duration-300 group cursor-pointer hover:scale-105 hover:bg-card/80"
+      className="p-6 glass hover:shadow-glow transition-all duration-300 group cursor-pointer hover:scale-105 hover:bg-card/80 relative"
       onClick={onClick}
     >
       <div className="space-y-4">
@@ -46,13 +45,9 @@ export const ConverterCard = ({ converter, onClick }: ConverterCardProps) => {
             )}
           </div>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="opacity-0 group-hover:opacity-100 transition-all duration-300 p-2 h-8 w-8"
-          >
+          <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted/40">
             <ArrowRight className="h-4 w-4" />
-          </Button>
+          </div>
         </div>
       </div>
     </Card>
