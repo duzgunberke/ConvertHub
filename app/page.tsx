@@ -1,15 +1,18 @@
 "use client"
 
-import { useState, useCallback } from "react";
-import { Search, Menu, Copy, Check, RotateCcw, Upload } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
+import { Search, Menu, Copy, Check, RotateCcw, Upload, AlertCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { CategorySidebar } from "@/components/convert/category-sidebar";
 import { ConverterCard } from "@/components/convert/converter-card";
 import { categories, Category, Converter } from "@/models/converter";
+import { useConverter } from "@/lib/api-client";
+import { ConversionResponse } from "@/types/converter";
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0]);
@@ -18,8 +21,10 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [outputValue, setOutputValue] = useState("");
-  const [isConverting, setIsConverting] = useState(false);
+  const [conversionResult, setConversionResult] = useState<ConversionResponse | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const { convertWithId, loading, error } = useConverter();
 
   const filteredCategories = categories.map(category => ({
     ...category,
@@ -30,61 +35,31 @@ export default function Home() {
   })).filter(category => category.converters.length > 0);
 
   const handleConvert = useCallback(async () => {
-    if (!inputValue.trim()) return;
-    
-    setIsConverting(true);
-    try {
-      // Simulate conversion delay for demo
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Mock conversion logic based on converter type
-      let result = "";
-      switch (selectedConverter.id) {
-        case "base64-encode":
-          result = btoa(inputValue);
-          break;
-        case "base64-decode":
-          try {
-            result = atob(inputValue);
-          } catch {
-            result = "Invalid Base64 input";
-          }
-          break;
-        case "url-encode":
-          result = encodeURIComponent(inputValue);
-          break;
-        case "url-decode":
-          result = decodeURIComponent(inputValue);
-          break;
-        case "html-encode":
-          result = inputValue
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#x27;");
-          break;
-        case "json-format":
-          try {
-            result = JSON.stringify(JSON.parse(inputValue), null, 2);
-          } catch {
-            result = "Invalid JSON input";
-          }
-          break;
-        case "hash-md5":
-          // Mock MD5 for demo - in real app would use crypto library
-          result = "5d41402abc4b2a76b9719d911017c592"; // Hello MD5
-          break;
-        default:
-          result = `Converted: ${inputValue}`;
-      }
-      setOutputValue(result);
-    } catch (error) {
-      toast.error("Conversion failed");
-    } finally {
-      setIsConverting(false);
+    if (!inputValue.trim()) {
+      toast.error("Please enter some input to convert");
+      return;
     }
-  }, [inputValue, selectedConverter.id]);
+    
+    try {
+      const result = await convertWithId(selectedConverter.id, inputValue);
+      
+      if (result?.success && result.output) {
+        setOutputValue(result.output);
+        setConversionResult(result);
+        toast.success("Conversion completed successfully");
+      } else {
+        const errorMessage = result?.error || "Conversion failed";
+        toast.error(errorMessage);
+        setOutputValue("");
+        setConversionResult(null);
+      }
+    } catch (err) {
+      console.error('Conversion error:', err);
+      toast.error("Failed to convert. Please try again.");
+      setOutputValue("");
+      setConversionResult(null);
+    }
+  }, [inputValue, selectedConverter.id, convertWithId]);
 
   const handleCopy = async () => {
     if (!outputValue) return;
@@ -102,19 +77,40 @@ export default function Home() {
   const handleClear = () => {
     setInputValue("");
     setOutputValue("");
+    setConversionResult(null);
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      toast.error("File size must be less than 10MB");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
       setInputValue(result);
+      toast.success(`File "${file.name}" loaded successfully`);
+    };
+    reader.onerror = () => {
+      toast.error("Failed to read file");
     };
     reader.readAsText(file);
   };
+
+  // Auto-convert on converter change (optional)
+  useEffect(() => {
+    if (inputValue.trim() && !loading) {
+      const timeoutId = setTimeout(() => {
+        handleConvert();
+      }, 1000); // Auto-convert after 1 second of inactivity
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [selectedConverter.id, inputValue, loading, handleConvert]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/5 flex overflow-hidden">
@@ -152,8 +148,11 @@ export default function Home() {
             />
           </div>
 
-          <div className="text-sm text-muted-foreground hidden md:block font-medium">
-            {selectedConverter.name}
+          <div className="text-sm text-muted-foreground hidden md:flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">
+              API Powered
+            </Badge>
+            <span className="font-medium">{selectedConverter.name}</span>
           </div>
         </header>
 
@@ -162,13 +161,40 @@ export default function Home() {
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Converter Header */}
             <div className="space-y-3">
-              <h1 className="text-4xl font-bold text-gradient-primary">
-                {selectedConverter.name}
-              </h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-4xl font-bold text-gradient-primary">
+                  {selectedConverter.name}
+                </h1>
+                {selectedConverter.featured && (
+                  <Badge className="bg-gradient-primary text-primary-foreground">
+                    Popular
+                  </Badge>
+                )}
+              </div>
               <p className="text-lg text-muted-foreground max-w-2xl">
                 {selectedConverter.description}
               </p>
+              
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2">
+                {selectedConverter.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
             </div>
+
+            {/* Error Display */}
+            {error && (
+              <Card className="p-4 border-destructive/50 bg-destructive/5">
+                <div className="flex items-center gap-2 text-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="font-medium">Conversion Error</span>
+                </div>
+                <p className="text-sm mt-1">{error}</p>
+              </Card>
+            )}
 
             {/* Converter Interface */}
             <div className="grid lg:grid-cols-2 gap-8">
@@ -182,12 +208,18 @@ export default function Home() {
                       size="sm"
                       onClick={handleClear}
                       className="h-8"
+                      disabled={loading}
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Clear
                     </Button>
                     <label>
-                      <Button variant="outline" size="sm" className="cursor-pointer h-8">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="cursor-pointer h-8"
+                        disabled={loading}
+                      >
                         <Upload className="h-4 w-4 mr-2" />
                         Upload
                       </Button>
@@ -195,24 +227,35 @@ export default function Home() {
                         type="file"
                         className="hidden"
                         onChange={handleFileUpload}
-                        accept=".txt,.json,.csv,.xml"
+                        accept=".txt,.json,.csv,.xml,.yaml,.yml"
+                        disabled={loading}
                       />
                     </label>
                   </div>
                 </div>
+                
                 <Textarea
                   placeholder="Enter your input here..."
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   className="min-h-[350px] bg-background/50 font-mono text-sm border-border/50 resize-none"
+                  disabled={loading}
                 />
+                
                 <Button
                   variant="default"
                   onClick={handleConvert}
-                  disabled={!inputValue.trim() || isConverting}
+                  disabled={!inputValue.trim() || loading}
                   className="w-full h-11 text-base font-medium"
                 >
-                  {isConverting ? "Converting..." : "Convert"}
+                  {loading ? (
+                    <>
+                      <Clock className="h-4 w-4 mr-2 animate-spin" />
+                      Converting...
+                    </>
+                  ) : (
+                    "Convert"
+                  )}
                 </Button>
               </Card>
 
@@ -224,7 +267,7 @@ export default function Home() {
                     variant="outline"
                     size="sm"
                     onClick={handleCopy}
-                    disabled={!outputValue}
+                    disabled={!outputValue || loading}
                     className="h-8"
                   >
                     {copied ? (
@@ -235,17 +278,51 @@ export default function Home() {
                     {copied ? "Copied!" : "Copy"}
                   </Button>
                 </div>
+                
                 <Textarea
                   placeholder="Output will appear here..."
                   value={outputValue}
                   readOnly
                   className="min-h-[350px] bg-background/30 font-mono text-sm border-border/50 resize-none"
                 />
-                <div className="h-11 flex items-center justify-center text-sm text-muted-foreground">
-                  {outputValue ? `${outputValue.length} characters` : "Ready to convert"}
+                
+                <div className="h-11 flex items-center justify-between text-sm text-muted-foreground">
+                  <span>
+                    {outputValue ? `${outputValue.length} characters` : "Ready to convert"}
+                  </span>
+                  {conversionResult?.metadata && (
+                    <span className="text-xs">
+                      Processed in {conversionResult.metadata.processingTime}ms
+                    </span>
+                  )}
                 </div>
               </Card>
             </div>
+
+            {/* Conversion Metadata */}
+            {conversionResult?.metadata && (
+              <Card className="p-4 glass">
+                <h4 className="font-semibold mb-3">Conversion Details</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Input Length:</span>
+                    <div className="font-mono">{conversionResult.metadata.inputLength} chars</div>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Output Length:</span>
+                    <div className="font-mono">{conversionResult.metadata.outputLength} chars</div>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Processing Time:</span>
+                    <div className="font-mono">{conversionResult.metadata.processingTime}ms</div>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Converter ID:</span>
+                    <div className="font-mono text-xs">{conversionResult.metadata.converterId}</div>
+                  </div>
+                </div>
+              </Card>
+            )}
 
             {/* Related Converters */}
             <div className="space-y-6">
