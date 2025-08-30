@@ -55,22 +55,22 @@ export const CategorySidebar = ({
       {/* Mobile Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
           onClick={onToggle}
         />
       )}
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed lg:relative inset-y-0 left-0 z-50 w-80 bg-card border-r border-border transition-transform duration-300 ease-in-out lg:translate-x-0",
+        "fixed lg:relative inset-y-0 left-0 z-50 w-[340px] bg-card/95 backdrop-blur-xl border-r border-border/50 transition-transform duration-300 ease-in-out lg:translate-x-0 shadow-2xl",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-4 border-b border-border bg-gradient-secondary">
+          <div className="p-6 border-b border-border/50 bg-gradient-to-r from-primary/5 to-accent/5">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gradient-primary">
+                <h2 className="text-2xl font-bold text-gradient-primary mb-1">
                   ConvertHub
                 </h2>
                 <p className="text-sm text-muted-foreground">
@@ -81,43 +81,46 @@ export const CategorySidebar = ({
                 variant="ghost"
                 size="sm"
                 onClick={onToggle}
-                className="lg:hidden"
+                className="lg:hidden h-8 w-8 p-0"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
           {/* Categories */}
           <ScrollArea className="flex-1 p-4">
-            <div className="space-y-2">
+            <div className="space-y-3">
               {categories.map((category) => {
                 const isExpanded = expandedCategories.has(category.id);
                 const isSelected = selectedCategory.id === category.id;
 
                 return (
-                  <div key={category.id} className="space-y-1">
+                  <div key={category.id} className="space-y-2">
                     {/* Category Header */}
                     <button
                       onClick={() => handleCategorySelect(category)}
                       className={cn(
-                        "w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200 text-left group hover:bg-muted/50",
-                        isSelected && "bg-muted shadow-sm"
+                        "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 text-left group hover:bg-muted/60 hover:shadow-md",
+                        isSelected && "bg-primary/10 shadow-lg ring-1 ring-primary/20"
                       )}
                     >
-                      <div className="flex items-center gap-3 flex-1">
-                        <span className="text-lg">{category.icon}</span>
-                        <div className="flex-1">
-                          <div className="font-medium group-hover:text-primary transition-colors">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <span className="text-xl flex-shrink-0">{category.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className={cn(
+                            "font-semibold text-sm transition-colors truncate",
+                            isSelected ? "text-primary" : "group-hover:text-primary"
+                          )}>
                             {category.name}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {category.count} tools
+                            {category.converters.length} tools
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Badge variant="secondary" className="text-xs px-2 py-0.5">
                           {category.converters.length}
                         </Badge>
                         <Button
@@ -127,7 +130,7 @@ export const CategorySidebar = ({
                             e.stopPropagation();
                             toggleCategory(category.id);
                           }}
-                          className="h-6 w-6 p-0"
+                          className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
                         >
                           {isExpanded ? (
                             <ChevronDown className="h-3 w-3" />
@@ -140,7 +143,7 @@ export const CategorySidebar = ({
 
                     {/* Converters List */}
                     {isExpanded && (
-                      <div className="ml-6 space-y-1 animate-slide-in">
+                      <div className="ml-8 space-y-1 animate-in slide-in-from-top-2 duration-200">
                         {category.converters.map((converter) => {
                           const isConverterSelected = selectedConverter.id === converter.id;
                           
@@ -149,18 +152,18 @@ export const CategorySidebar = ({
                               key={converter.id}
                               onClick={() => onConverterSelect(converter)}
                               className={cn(
-                                "w-full flex items-center gap-2 p-2 rounded-md text-sm transition-all duration-200 text-left hover:bg-muted/30",
-                                isConverterSelected && "bg-primary/10 text-primary font-medium border border-primary/20"
+                                "w-full flex items-center gap-3 p-2.5 rounded-lg text-sm transition-all duration-200 text-left hover:bg-muted/40",
+                                isConverterSelected && "bg-primary/15 text-primary font-medium border border-primary/30 shadow-sm"
                               )}
                             >
-                              <div className="flex-1">
-                                <div className="font-medium">{converter.name}</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-sm truncate">{converter.name}</div>
                                 <div className="text-xs text-muted-foreground line-clamp-1">
                                   {converter.description}
                                 </div>
                               </div>
                               {converter.featured && (
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant="outline" className="text-xs px-1.5 py-0.5 flex-shrink-0">
                                   Popular
                                 </Badge>
                               )}
@@ -176,10 +179,10 @@ export const CategorySidebar = ({
           </ScrollArea>
 
           {/* Footer */}
-          <div className="p-4 border-t border-border bg-gradient-secondary">
-            <div className="text-center text-xs text-muted-foreground">
-              <div>200+ conversion tools</div>
-              <div className="mt-1 text-primary">Professional Edition</div>
+          <div className="p-4 border-t border-border/50 bg-gradient-to-r from-secondary/20 to-accent/10">
+            <div className="text-center">
+              <div className="text-sm font-medium text-foreground/80">200+ conversion tools</div>
+              <div className="text-xs text-primary font-semibold mt-1">Professional Edition</div>
             </div>
           </div>
         </div>

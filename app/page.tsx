@@ -117,7 +117,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/5 flex overflow-hidden">
       {/* Sidebar */}
       <CategorySidebar 
         categories={filteredCategories}
@@ -130,16 +130,16 @@ export default function Home() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="bg-card border-b border-border p-4 flex items-center gap-4">
+        <header className="bg-card/60 backdrop-blur-xl border-b border-border/50 p-4 flex items-center gap-4 shadow-sm">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden"
+            className="lg:hidden h-9 w-9 p-0"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-4 w-4" />
           </Button>
 
           <div className="flex-1 max-w-md relative">
@@ -148,45 +148,46 @@ export default function Home() {
               placeholder="Search converters..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-background/50"
+              className="pl-10 bg-background/50 border-border/50 h-9"
             />
           </div>
 
-          <div className="text-sm text-muted-foreground hidden md:block">
+          <div className="text-sm text-muted-foreground hidden md:block font-medium">
             {selectedConverter.name}
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="max-w-7xl mx-auto space-y-8">
             {/* Converter Header */}
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-gradient-primary">
+            <div className="space-y-3">
+              <h1 className="text-4xl font-bold text-gradient-primary">
                 {selectedConverter.name}
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-lg text-muted-foreground max-w-2xl">
                 {selectedConverter.description}
               </p>
             </div>
 
             {/* Converter Interface */}
-            <div className="grid lg:grid-cols-2 gap-6">
+            <div className="grid lg:grid-cols-2 gap-8">
               {/* Input */}
-              <Card className="p-6 space-y-4 glass">
+              <Card className="p-6 space-y-4 glass shadow-card">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Input</h3>
+                  <h3 className="text-xl font-semibold">Input</h3>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={handleClear}
+                      className="h-8"
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Clear
                     </Button>
                     <label>
-                      <Button variant="outline" size="sm" className="cursor-pointer">
+                      <Button variant="outline" size="sm" className="cursor-pointer h-8">
                         <Upload className="h-4 w-4 mr-2" />
                         Upload
                       </Button>
@@ -203,30 +204,31 @@ export default function Home() {
                   placeholder="Enter your input here..."
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  className="min-h-[300px] bg-background/50 font-mono"
+                  className="min-h-[350px] bg-background/50 font-mono text-sm border-border/50 resize-none"
                 />
                 <Button
                   variant="default"
                   onClick={handleConvert}
                   disabled={!inputValue.trim() || isConverting}
-                  className="w-full"
+                  className="w-full h-11 text-base font-medium"
                 >
                   {isConverting ? "Converting..." : "Convert"}
                 </Button>
               </Card>
 
               {/* Output */}
-              <Card className="p-6 space-y-4 glass">
+              <Card className="p-6 space-y-4 glass shadow-card">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Output</h3>
+                  <h3 className="text-xl font-semibold">Output</h3>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleCopy}
                     disabled={!outputValue}
+                    className="h-8"
                   >
                     {copied ? (
-                      <Check className="h-4 w-4 mr-2" />
+                      <Check className="h-4 w-4 mr-2 text-green-500" />
                     ) : (
                       <Copy className="h-4 w-4 mr-2" />
                     )}
@@ -237,15 +239,18 @@ export default function Home() {
                   placeholder="Output will appear here..."
                   value={outputValue}
                   readOnly
-                  className="min-h-[300px] bg-background/50 font-mono"
+                  className="min-h-[350px] bg-background/30 font-mono text-sm border-border/50 resize-none"
                 />
+                <div className="h-11 flex items-center justify-center text-sm text-muted-foreground">
+                  {outputValue ? `${outputValue.length} characters` : "Ready to convert"}
+                </div>
               </Card>
             </div>
 
             {/* Related Converters */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">Related Converters</h3>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-6">
+              <h3 className="text-2xl font-semibold">Related Converters</h3>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {selectedCategory.converters
                   .filter(c => c.id !== selectedConverter.id)
                   .slice(0, 3)
