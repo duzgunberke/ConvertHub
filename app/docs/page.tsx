@@ -9,7 +9,6 @@ export default async function DocsPage() {
 
   return (
     <main className="prose prose-invert mx-auto max-w-4xl py-8">
-      <h1>ConvertHub API Documentation</h1>
       <ReactMarkdown>{markdown}</ReactMarkdown>
     </main>
   );
