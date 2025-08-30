@@ -1,15 +1,15 @@
 "use client"
 
 import { useState, useCallback } from "react";
-import { Search, Menu, Copy, Check, RotateCcw, Upload, AlertCircle, Clock } from "lucide-react";
+import { Search, Menu, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { CategorySidebar } from "@/components/convert/category-sidebar";
 import { ConverterCard } from "@/components/convert/converter-card";
+import { DynamicConverterUI } from "@/components/convert/dynamic-converter";
 import { categories, Category, Converter } from "@/models/converter";
 import { useConverter } from "@/lib/api-client";
 import { ConversionResponse } from "@/types/converter";
@@ -21,6 +21,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [outputValue, setOutputValue] = useState("");
+  const [options, setOptions] = useState<Record<string, any>>({});
   const [conversionResult, setConversionResult] = useState<ConversionResponse | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -35,14 +36,15 @@ export default function Home() {
     )
   })).filter(category => category.converters.length > 0);
 
-  const handleConvert = useCallback(async () => {
-    if (!inputValue.trim()) {
+  const handleConvert = useCallback(async (input?: string, opts?: Record<string, any>) => {
+    // For generators, input might be undefined
+    if (selectedConverter.inputType !== 'generator' && (!input || !input.trim())) {
       toast.error("Please enter some input to convert");
       return;
     }
     
     try {
-      const result = await convertWithId(selectedConverter.id, inputValue);
+      const result = await convertWithId(selectedConverter.id, input || '', opts || options);
       
       if (result?.success && result.output !== undefined) {
         setOutputValue(result.output);
@@ -60,7 +62,7 @@ export default function Home() {
       setOutputValue("");
       setConversionResult(null);
     }
-  }, [inputValue, selectedConverter.id, convertWithId]);
+  }, [selectedConverter.id, selectedConverter.inputType, convertWithId, options]);
 
   const handleCopy = async () => {
     if (!outputValue) return;
@@ -78,35 +80,17 @@ export default function Home() {
   const handleClear = () => {
     setInputValue("");
     setOutputValue("");
+    setOptions({});
     setConversionResult(null);
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      toast.error("File size must be less than 10MB");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setInputValue(result);
-      toast.success(`File "${file.name}" loaded successfully`);
-    };
-    reader.onerror = () => {
-      toast.error("Failed to read file");
-    };
-    reader.readAsText(file);
   };
 
   const handleConverterSelect = (converter: Converter) => {
     setSelectedConverter(converter);
-    // Clear outputs when switching converter
+    // Clear outputs and options when switching converter
     setOutputValue("");
     setConversionResult(null);
+    setInputValue("");
+    setOptions({});
   };
 
   const handleCategorySelect = (category: Category) => {
@@ -114,6 +98,20 @@ export default function Home() {
     if (category.converters.length > 0) {
       handleConverterSelect(category.converters[0]);
     }
+  };
+
+  // Create a converter config object for the dynamic UI
+  const converterConfig = {
+    ...selectedConverter,
+    inputType: selectedConverter.inputType || 'text',
+    inputPlaceholder: getInputPlaceholder(selectedConverter),
+    inputLabel: getInputLabel(selectedConverter),
+    outputLabel: getOutputLabel(selectedConverter),
+    outputType: getOutputType(selectedConverter),
+    inputFields: getInputFields(selectedConverter),
+    allowFileUpload: getAllowFileUpload(selectedConverter),
+    maxFileSize: 10 * 1024 * 1024, // 10MB
+    acceptedFileTypes: getAcceptedFileTypes(selectedConverter)
   };
 
   return (
@@ -174,6 +172,9 @@ export default function Home() {
                     Popular
                   </Badge>
                 )}
+                <Badge variant="secondary" className="text-xs">
+                  {getConverterTypeLabel(selectedConverter.inputType)}
+                </Badge>
               </div>
               <p className="text-lg text-muted-foreground max-w-2xl">
                 {selectedConverter.description}
@@ -200,108 +201,20 @@ export default function Home() {
               </Card>
             )}
 
-            {/* Converter Interface */}
-            <div className="grid lg:grid-cols-2 gap-8">
-              {/* Input */}
-              <Card className="p-6 space-y-4 glass shadow-card">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold">Input</h3>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleClear}
-                      className="h-8"
-                      disabled={loading}
-                    >
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Clear
-                    </Button>
-                    <label>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="cursor-pointer h-8"
-                        disabled={loading}
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload
-                      </Button>
-                      <input
-                        type="file"
-                        className="hidden"
-                        onChange={handleFileUpload}
-                        accept=".txt,.json,.csv,.xml,.yaml,.yml"
-                        disabled={loading}
-                      />
-                    </label>
-                  </div>
-                </div>
-                
-                <Textarea
-                  placeholder="Enter your input here..."
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  className="min-h-[350px] bg-background/50 font-mono text-sm border-border/50 resize-none"
-                  disabled={loading}
-                />
-                
-                <Button
-                  variant="default"
-                  onClick={handleConvert}
-                  disabled={!inputValue.trim() || loading}
-                  className="w-full h-11 text-base font-medium"
-                >
-                  {loading ? (
-                    <>
-                      <Clock className="h-4 w-4 mr-2 animate-spin" />
-                      Converting...
-                    </>
-                  ) : (
-                    "Convert"
-                  )}
-                </Button>
-              </Card>
-
-              {/* Output */}
-              <Card className="p-6 space-y-4 glass shadow-card">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold">Output</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCopy}
-                    disabled={!outputValue || loading}
-                    className="h-8"
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4 mr-2 text-green-500" />
-                    ) : (
-                      <Copy className="h-4 w-4 mr-2" />
-                    )}
-                    {copied ? "Copied!" : "Copy"}
-                  </Button>
-                </div>
-                
-                <Textarea
-                  placeholder="Output will appear here..."
-                  value={outputValue}
-                  readOnly
-                  className="min-h-[350px] bg-background/30 font-mono text-sm border-border/50 resize-none"
-                />
-                
-                <div className="h-11 flex items-center justify-between text-sm text-muted-foreground">
-                  <span>
-                    {outputValue ? `${outputValue.length} characters` : "Ready to convert"}
-                  </span>
-                  {conversionResult?.metadata && (
-                    <span className="text-xs">
-                      Processed in {conversionResult.metadata.processingTime}ms
-                    </span>
-                  )}
-                </div>
-              </Card>
-            </div>
+            {/* Dynamic Converter Interface */}
+            <DynamicConverterUI
+              converter={converterConfig}
+              onConvert={handleConvert}
+              loading={loading}
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+              outputValue={outputValue}
+              options={options}
+              setOptions={setOptions}
+              onClear={handleClear}
+              onCopy={handleCopy}
+              copied={copied}
+            />
 
             {/* Conversion Metadata */}
             {conversionResult?.metadata && (
@@ -349,4 +262,308 @@ export default function Home() {
       </div>
     </div>
   );
-};
+}
+
+// Helper functions for converter configuration
+function getInputPlaceholder(converter: Converter): string {
+  switch (converter.id) {
+    case 'regex-test':
+      return 'Enter text to test against your regular expression...';
+    case 'csv-to-json':
+      return 'name,age,city\nJohn,30,New York\nJane,25,Los Angeles';
+    case 'json-to-csv':
+      return '[{"name":"John","age":30},{"name":"Jane","age":25}]';
+    case 'css-minify':
+    case 'css-format':
+      return '.container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}';
+    case 'sql-format':
+      return 'SELECT users.name, orders.total FROM users LEFT JOIN orders ON users.id = orders.user_id WHERE users.active = 1 ORDER BY orders.total DESC';
+    case 'json-format':
+    case 'json-minify':
+      return '{"name": "John", "age": 30, "hobbies": ["reading", "gaming"]}';
+    case 'qr-generate':
+      return 'Enter text to convert to QR code...';
+    default:
+      return 'Enter your input here...';
+  }
+}
+
+function getInputLabel(converter: Converter): string {
+  switch (converter.inputType) {
+    case 'generator':
+      return 'Generator Settings';
+    case 'options':
+      return 'Input & Configuration';
+    case 'file':
+      return 'File Upload';
+    case 'multiline':
+      return 'Code Input';
+    case 'json':
+      return 'JSON Input';
+    default:
+      return 'Input';
+  }
+}
+
+function getOutputLabel(converter: Converter): string {
+  switch (converter.id) {
+    case 'qr-generate':
+      return 'QR Code';
+    case 'regex-test':
+      return 'Test Results';
+    case 'password-generate':
+      return 'Generated Password';
+    case 'uuid-generate':
+      return 'Generated UUID';
+    case 'lorem-generate':
+      return 'Generated Text';
+    default:
+      return 'Output';
+  }
+}
+
+function getOutputType(converter: Converter): 'text' | 'json' | 'qr' | 'image' {
+  switch (converter.id) {
+    case 'qr-generate':
+      return 'qr';
+    default:
+      return 'text';
+  }
+}
+
+function getInputFields(converter: Converter) {
+  switch (converter.id) {
+    case 'password-generate':
+      return [
+        {
+          name: 'length',
+          label: 'Password Length',
+          type: 'range' as const,
+          defaultValue: 16,
+          min: 4,
+          max: 128,
+          description: 'Length of the generated password'
+        },
+        {
+          name: 'includeUppercase',
+          label: 'Include Uppercase Letters (A-Z)',
+          type: 'checkbox' as const,
+          defaultValue: true,
+          description: 'Include uppercase letters in the password'
+        },
+        {
+          name: 'includeLowercase',
+          label: 'Include Lowercase Letters (a-z)',
+          type: 'checkbox' as const,
+          defaultValue: true,
+          description: 'Include lowercase letters in the password'
+        },
+        {
+          name: 'includeNumbers',
+          label: 'Include Numbers (0-9)',
+          type: 'checkbox' as const,
+          defaultValue: true,
+          description: 'Include numbers in the password'
+        },
+        {
+          name: 'includeSymbols',
+          label: 'Include Symbols (!@#$%^&*)',
+          type: 'checkbox' as const,
+          defaultValue: true,
+          description: 'Include special symbols in the password'
+        },
+        {
+          name: 'excludeSimilar',
+          label: 'Exclude Similar Characters (0,O,l,I)',
+          type: 'checkbox' as const,
+          defaultValue: false,
+          description: 'Avoid confusing characters like 0, O, l, I'
+        }
+      ];
+
+    case 'qr-generate':
+      return [
+        {
+          name: 'size',
+          label: 'QR Code Size',
+          type: 'range' as const,
+          defaultValue: 200,
+          min: 100,
+          max: 500,
+          description: 'Size of the QR code in pixels'
+        },
+        {
+          name: 'errorLevel',
+          label: 'Error Correction Level',
+          type: 'select' as const,
+          defaultValue: 'M',
+          options: [
+            { label: 'Low (L) - ~7%', value: 'L' },
+            { label: 'Medium (M) - ~15%', value: 'M' },
+            { label: 'Quartile (Q) - ~25%', value: 'Q' },
+            { label: 'High (H) - ~30%', value: 'H' }
+          ],
+          description: 'Higher levels can recover from more damage'
+        }
+      ];
+
+    case 'lorem-generate':
+      return [
+        {
+          name: 'wordCount',
+          label: 'Word Count',
+          type: 'range' as const,
+          defaultValue: 50,
+          min: 10,
+          max: 500,
+          description: 'Number of words to generate'
+        }
+      ];
+
+    case 'regex-test':
+      return [
+        {
+          name: 'pattern',
+          label: 'Regular Expression Pattern',
+          type: 'text' as const,
+          placeholder: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+          required: true,
+          description: 'Enter your regex pattern (without delimiters)'
+        },
+        {
+          name: 'flags',
+          label: 'Regex Flags',
+          type: 'text' as const,
+          placeholder: 'gi',
+          defaultValue: 'g',
+          description: 'g=global, i=ignoreCase, m=multiline, s=dotAll, u=unicode, y=sticky'
+        },
+        {
+          name: 'showMatches',
+          label: 'Show Match Details',
+          type: 'checkbox' as const,
+          defaultValue: true,
+          description: 'Display matched groups and positions'
+        }
+      ];
+
+    case 'sql-format':
+      return [
+        {
+          name: 'uppercase',
+          label: 'Uppercase Keywords',
+          type: 'checkbox' as const,
+          defaultValue: true,
+          description: 'Convert SQL keywords to uppercase'
+        }
+      ];
+
+    case 'css-format':
+      return [
+        {
+          name: 'indentSize',
+          label: 'Indent Size',
+          type: 'range' as const,
+          defaultValue: 2,
+          min: 2,
+          max: 8,
+          description: 'Number of spaces for indentation'
+        }
+      ];
+
+    case 'csv-to-json':
+      return [
+        {
+          name: 'delimiter',
+          label: 'CSV Delimiter',
+          type: 'select' as const,
+          defaultValue: ',',
+          options: [
+            { label: 'Comma (,)', value: ',' },
+            { label: 'Semicolon (;)', value: ';' },
+            { label: 'Tab', value: '\t' },
+            { label: 'Pipe (|)', value: '|' }
+          ],
+          description: 'Character that separates CSV values'
+        },
+        {
+          name: 'hasHeader',
+          label: 'First Row Contains Headers',
+          type: 'checkbox' as const,
+          defaultValue: true,
+          description: 'Use first row as JSON object keys'
+        }
+      ];
+
+    case 'json-to-csv':
+      return [
+        {
+          name: 'delimiter',
+          label: 'CSV Delimiter',
+          type: 'select' as const,
+          defaultValue: ',',
+          options: [
+            { label: 'Comma (,)', value: ',' },
+            { label: 'Semicolon (;)', value: ';' },
+            { label: 'Tab', value: '\t' },
+            { label: 'Pipe (|)', value: '|' }
+          ],
+          description: 'Character to separate CSV values'
+        }
+      ];
+
+    case 'json-format':
+      return [
+        {
+          name: 'indent',
+          label: 'Indentation',
+          type: 'range' as const,
+          defaultValue: 2,
+          min: 1,
+          max: 8,
+          description: 'Number of spaces for indentation'
+        }
+      ];
+
+    default:
+      return [];
+  }
+}
+
+function getAllowFileUpload(converter: Converter): boolean {
+  const fileUploadConverters = [
+    'css-format', 'css-minify', 'sql-format', 
+    'json-format', 'json-minify', 'csv-to-json'
+  ];
+  return fileUploadConverters.includes(converter.id);
+}
+
+function getAcceptedFileTypes(converter: Converter): string[] {
+  switch (converter.category) {
+    case 'css-tools':
+      return ['.css', '.scss', '.less'];
+    case 'database-tools':
+      return ['.sql'];
+    case 'data-formats':
+      return ['.json', '.csv', '.xml', '.yaml', '.yml'];
+    default:
+      return ['.txt'];
+  }
+}
+
+function getConverterTypeLabel(inputType?: string): string {
+  switch (inputType) {
+    case 'generator':
+      return 'Generator';
+    case 'options':
+      return 'Advanced';
+    case 'file':
+      return 'File Tool';
+    case 'multiline':
+      return 'Code Tool';
+    case 'regex':
+      return 'Tester';
+    default:
+      return 'Tool';
+  }
+}

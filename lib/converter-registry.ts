@@ -1,7 +1,7 @@
-// lib/converter-registry.ts
+// lib/converter-registry.ts - Updated with new converters
 import { BaseConverter } from '@/types/converter';
 
-// Import all converters
+// Import existing converters
 import {
   // Text & Encoding
   Base64EncodeConverter,
@@ -42,9 +42,35 @@ import {
 
   // Generators
   UUIDGeneratorConverter,
-  PasswordGeneratorConverter,
   LoremGeneratorConverter,
 } from './converters/all-converters';
+
+// Import new advanced converters
+import {
+  // CSS Tools
+  CSSMinifierConverter,
+  CSSFormatterConverter,
+
+  // Database Tools
+  SQLFormatterConverter,
+
+  // RegEx Tools
+  RegexTesterConverter,
+
+  // QR Code Generator
+  QRCodeGeneratorConverter,
+
+  // Unicode/ASCII
+  UnicodeToAsciiConverter,
+  AsciiToUnicodeConverter,
+
+  // Data Format Converters
+  CSVToJSONConverter,
+  JSONToCSVConverter,
+
+  // Enhanced Generators
+  PasswordGeneratorConverter,
+} from './converters/advanced-converters';
 
 export class ConverterRegistry {
   private static instance: ConverterRegistry;
@@ -63,7 +89,7 @@ export class ConverterRegistry {
 
   private registerAllConverters() {
     const converters = [
-      // Text & Encoding
+      // Text & Encoding (12 converters)
       new Base64EncodeConverter(),
       new Base64DecodeConverter(),
       new URLEncodeConverter(),
@@ -74,36 +100,51 @@ export class ConverterRegistry {
       new TextLowercaseConverter(),
       new TextCapitalizeConverter(),
       new TextReverseConverter(),
+      new UnicodeToAsciiConverter(),
+      new AsciiToUnicodeConverter(),
 
-      // Cryptography
+      // Cryptography (5 converters)
       new MD5HashConverter(),
       new SHA1HashConverter(),
       new SHA256HashConverter(),
       new SHA512HashConverter(),
       new HMACConverter(),
 
-      // Numbers & Math
+      // Numbers & Math (4 converters)
       new DecimalToBinaryConverter(),
       new BinaryToDecimalConverter(),
       new DecimalToHexConverter(),
       new HexToDecimalConverter(),
 
-      // Colors & Design
+      // Colors & Design (2 converters)
       new HexToRGBConverter(),
       new RGBToHexConverter(),
 
-      // Time & Date
+      // Time & Date (2 converters)
       new TimestampToDateConverter(),
       new DateToTimestampConverter(),
 
-      // Data Formats
+      // Data Formats (4 converters)
       new JSONFormatterConverter(),
       new JSONMinifyConverter(),
+      new CSVToJSONConverter(),
+      new JSONToCSVConverter(),
 
-      // Generators
+      // CSS Tools (2 converters)
+      new CSSMinifierConverter(),
+      new CSSFormatterConverter(),
+
+      // Database Tools (1 converter)
+      new SQLFormatterConverter(),
+
+      // RegEx Tools (1 converter)
+      new RegexTesterConverter(),
+
+      // Generators (4 converters)
       new UUIDGeneratorConverter(),
       new PasswordGeneratorConverter(),
       new LoremGeneratorConverter(),
+      new QRCodeGeneratorConverter(),
     ];
 
     converters.forEach(converter => this.register(converter));

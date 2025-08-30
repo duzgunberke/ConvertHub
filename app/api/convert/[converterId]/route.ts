@@ -1,4 +1,4 @@
-// app/api/convert/[converterId]/route.ts
+// app/api/convert/[converterId]/route.ts - Fixed version
 import { NextRequest, NextResponse } from 'next/server';
 import { converterRegistry } from '@/lib/converter-registry';
 import { ConversionRequest } from '@/types/converter';
@@ -11,21 +11,24 @@ export async function POST(
     const { converterId } = await context.params;
     const body = await request.json();
     
-    // Validate request
-    if (!body.input) {
-      return NextResponse.json({
-        success: false,
-        error: 'Missing required field: input'
-      }, { status: 400 });
-    }
-
-    // Get converter
+    // Get converter first to check its type
     const converter = converterRegistry.get(converterId);
     if (!converter) {
       return NextResponse.json({
         success: false,
         error: `Converter '${converterId}' not found`
       }, { status: 404 });
+    }
+
+    // For generators, input is not required
+    const isGenerator = converter.inputType === 'generator';
+    
+    // Validate request based on converter type
+    if (!isGenerator && (!body.input || body.input.trim().length === 0)) {
+      return NextResponse.json({
+        success: false,
+        error: 'Missing required field: input'
+      }, { status: 400 });
     }
 
     // Create conversion request

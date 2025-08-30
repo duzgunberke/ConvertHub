@@ -1,9 +1,10 @@
-// types/converter.ts
+// types/converter.ts - Enhanced version
 
 export interface ConversionRequest {
-  input: string;
+  input?: string;  // Made optional for generators
   converterId: string;
   options?: Record<string, any>;
+  files?: File[];  // For file-based converters
 }
 
 export interface ConversionResponse {
@@ -18,6 +19,32 @@ export interface ConversionResponse {
   };
 }
 
+// New converter input types
+export type ConverterInputType = 
+  | 'text'           // Default text input
+  | 'generator'      // No input needed, just generate
+  | 'number'         // Number input
+  | 'options'        // Form with options
+  | 'file'           // File upload
+  | 'multiline'      // Large text area
+  | 'json'           // JSON specific input
+  | 'regex'          // Regex tester
+  | 'color';         // Color picker
+
+// Input field configuration
+export interface InputField {
+  name: string;
+  label: string;
+  type: 'text' | 'number' | 'select' | 'checkbox' | 'range' | 'color' | 'file';
+  placeholder?: string;
+  defaultValue?: any;
+  options?: Array<{ label: string; value: any }>;
+  min?: number;
+  max?: number;
+  required?: boolean;
+  description?: string;
+}
+
 export interface ConverterConfig {
   id: string;
   name: string;
@@ -25,17 +52,38 @@ export interface ConverterConfig {
   category: string;
   tags: string[];
   featured?: boolean;
+  inputType: ConverterInputType;
+  
+  // Input configuration
+  inputFields?: InputField[];
+  inputPlaceholder?: string;
+  inputLabel?: string;
+  
+  // Output configuration
+  outputType?: 'text' | 'json' | 'qr' | 'image';
+  outputLabel?: string;
+  
+  // UI hints
+  allowFileUpload?: boolean;
+  maxFileSize?: number;
+  acceptedFileTypes?: string[];
+  showInputCounter?: boolean;
+  showOutputCounter?: boolean;
+  
   inputValidation?: {
     required: boolean;
     minLength?: number;
     maxLength?: number;
     pattern?: string;
   };
-  outputFormat?: string;
-  examples?: {
-    input: string;
+  
+  examples?: Array<{
+    name: string;
+    input?: string;
+    options?: Record<string, any>;
     output: string;
-  }[];
+    description?: string;
+  }>;
 }
 
 export abstract class BaseConverter {
@@ -44,10 +92,32 @@ export abstract class BaseConverter {
   abstract description: string;
   abstract category: string;
   abstract tags: string[];
+  inputType: ConverterInputType = 'text'; // Default to text
 
-  abstract convert(input: string, options?: Record<string, any>): Promise<string>;
+  // Input configuration
+  inputFields?: InputField[];
+  inputPlaceholder?: string;
+  inputLabel?: string;
   
-  validate(input: string): { valid: boolean; error?: string } {
+  // Output configuration
+  outputType?: 'text' | 'json' | 'qr' | 'image' = 'text';
+  outputLabel?: string;
+  
+  // UI configuration
+  allowFileUpload?: boolean = false;
+  maxFileSize?: number = 10 * 1024 * 1024; // 10MB
+  acceptedFileTypes?: string[] = ['.txt', '.json', '.csv'];
+  showInputCounter?: boolean = true;
+  showOutputCounter?: boolean = true;
+
+  abstract convert(input?: string, options?: Record<string, any>): Promise<string>;
+  
+  validate(input?: string, options?: Record<string, any>): { valid: boolean; error?: string } {
+    // For generators, input is not required
+    if (this.inputType === 'generator') {
+      return { valid: true };
+    }
+    
     if (!input || input.trim().length === 0) {
       return { valid: false, error: "Input is required" };
     }
@@ -58,7 +128,7 @@ export abstract class BaseConverter {
     const startTime = Date.now();
     
     try {
-      const validation = this.validate(request.input);
+      const validation = this.validate(request.input, request.options);
       if (!validation.valid) {
         return {
           success: false,
@@ -73,7 +143,7 @@ export abstract class BaseConverter {
         success: true,
         output,
         metadata: {
-          inputLength: request.input.length,
+          inputLength: request.input?.length || 0,
           outputLength: output.length,
           processingTime,
           converterId: this.id,
@@ -84,7 +154,7 @@ export abstract class BaseConverter {
         success: false,
         error: error instanceof Error ? error.message : "Conversion failed",
         metadata: {
-          inputLength: request.input.length,
+          inputLength: request.input?.length || 0,
           outputLength: 0,
           processingTime: Date.now() - startTime,
           converterId: this.id,
