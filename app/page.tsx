@@ -12,7 +12,7 @@ import { ConverterCard } from "@/components/convert/converter-card";
 import { DynamicConverterUI } from "@/components/convert/dynamic-converter";
 import { categories, Category, Converter } from "@/models/converter";
 import { useConverter } from "@/lib/api-client";
-import { ConversionResponse } from "@/types/converter";
+import { ConversionResponse, InputField } from "@/types/converter";
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0]);
@@ -282,7 +282,7 @@ function getInputPlaceholder(converter: Converter): string {
     case 'json-minify':
       return '{"name": "John", "age": 30, "hobbies": ["reading", "gaming"]}';
     case 'qr-generate':
-      return 'Enter text to convert to QR code...';
+      return 'Hello World';
     default:
       return 'Enter your input here...';
   }
@@ -331,14 +331,14 @@ function getOutputType(converter: Converter): 'text' | 'json' | 'qr' | 'image' {
   }
 }
 
-function getInputFields(converter: Converter) {
+function getInputFields(converter: Converter): InputField[] {
   switch (converter.id) {
     case 'password-generate':
       return [
         {
           name: 'length',
           label: 'Password Length',
-          type: 'range' as const,
+          type: 'range',
           defaultValue: 16,
           min: 4,
           max: 128,
@@ -347,35 +347,35 @@ function getInputFields(converter: Converter) {
         {
           name: 'includeUppercase',
           label: 'Include Uppercase Letters (A-Z)',
-          type: 'checkbox' as const,
+          type: 'checkbox',
           defaultValue: true,
           description: 'Include uppercase letters in the password'
         },
         {
           name: 'includeLowercase',
           label: 'Include Lowercase Letters (a-z)',
-          type: 'checkbox' as const,
+          type: 'checkbox',
           defaultValue: true,
           description: 'Include lowercase letters in the password'
         },
         {
           name: 'includeNumbers',
           label: 'Include Numbers (0-9)',
-          type: 'checkbox' as const,
+          type: 'checkbox',
           defaultValue: true,
           description: 'Include numbers in the password'
         },
         {
           name: 'includeSymbols',
           label: 'Include Symbols (!@#$%^&*)',
-          type: 'checkbox' as const,
+          type: 'checkbox',
           defaultValue: true,
           description: 'Include special symbols in the password'
         },
         {
           name: 'excludeSimilar',
           label: 'Exclude Similar Characters (0,O,l,I)',
-          type: 'checkbox' as const,
+          type: 'checkbox',
           defaultValue: false,
           description: 'Avoid confusing characters like 0, O, l, I'
         }
@@ -386,7 +386,7 @@ function getInputFields(converter: Converter) {
         {
           name: 'size',
           label: 'QR Code Size',
-          type: 'range' as const,
+          type: 'range',
           defaultValue: 200,
           min: 100,
           max: 500,
@@ -395,7 +395,7 @@ function getInputFields(converter: Converter) {
         {
           name: 'errorLevel',
           label: 'Error Correction Level',
-          type: 'select' as const,
+          type: 'select',
           defaultValue: 'M',
           options: [
             { label: 'Low (L) - ~7%', value: 'L' },
@@ -412,7 +412,7 @@ function getInputFields(converter: Converter) {
         {
           name: 'wordCount',
           label: 'Word Count',
-          type: 'range' as const,
+          type: 'range',
           defaultValue: 50,
           min: 10,
           max: 500,
@@ -425,15 +425,15 @@ function getInputFields(converter: Converter) {
         {
           name: 'pattern',
           label: 'Regular Expression Pattern',
-          type: 'text' as const,
-          placeholder: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+          type: 'text',
+          placeholder: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}',
           required: true,
           description: 'Enter your regex pattern (without delimiters)'
         },
         {
           name: 'flags',
           label: 'Regex Flags',
-          type: 'text' as const,
+          type: 'text',
           placeholder: 'gi',
           defaultValue: 'g',
           description: 'g=global, i=ignoreCase, m=multiline, s=dotAll, u=unicode, y=sticky'
@@ -441,7 +441,7 @@ function getInputFields(converter: Converter) {
         {
           name: 'showMatches',
           label: 'Show Match Details',
-          type: 'checkbox' as const,
+          type: 'checkbox',
           defaultValue: true,
           description: 'Display matched groups and positions'
         }
@@ -452,7 +452,7 @@ function getInputFields(converter: Converter) {
         {
           name: 'uppercase',
           label: 'Uppercase Keywords',
-          type: 'checkbox' as const,
+          type: 'checkbox',
           defaultValue: true,
           description: 'Convert SQL keywords to uppercase'
         }
@@ -463,7 +463,7 @@ function getInputFields(converter: Converter) {
         {
           name: 'indentSize',
           label: 'Indent Size',
-          type: 'range' as const,
+          type: 'range',
           defaultValue: 2,
           min: 2,
           max: 8,
@@ -476,7 +476,7 @@ function getInputFields(converter: Converter) {
         {
           name: 'delimiter',
           label: 'CSV Delimiter',
-          type: 'select' as const,
+          type: 'select',
           defaultValue: ',',
           options: [
             { label: 'Comma (,)', value: ',' },
@@ -489,7 +489,7 @@ function getInputFields(converter: Converter) {
         {
           name: 'hasHeader',
           label: 'First Row Contains Headers',
-          type: 'checkbox' as const,
+          type: 'checkbox',
           defaultValue: true,
           description: 'Use first row as JSON object keys'
         }
@@ -500,7 +500,7 @@ function getInputFields(converter: Converter) {
         {
           name: 'delimiter',
           label: 'CSV Delimiter',
-          type: 'select' as const,
+          type: 'select',
           defaultValue: ',',
           options: [
             { label: 'Comma (,)', value: ',' },
@@ -517,7 +517,7 @@ function getInputFields(converter: Converter) {
         {
           name: 'indent',
           label: 'Indentation',
-          type: 'range' as const,
+          type: 'range',
           defaultValue: 2,
           min: 1,
           max: 8,

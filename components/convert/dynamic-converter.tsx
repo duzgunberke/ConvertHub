@@ -453,18 +453,33 @@ export const DynamicConverterUI: React.FC<DynamicConverterUIProps> = ({
           ) : (
             <Copy className="h-4 w-4 mr-2" />
           )}
-          {copied ? "Copied!" : "Copy"}
+          {copied ? "Copied!" : converter.outputType === 'qr' ? 'Copy URL' : 'Copy'}
         </Button>
       </div>
       
       {converter.outputType === 'qr' ? (
-        <div className="flex justify-center p-8 bg-white rounded-lg">
+        <div className="flex justify-center p-8 bg-white rounded-lg min-h-[300px] items-center">
           {outputValue ? (
-            <img src={outputValue} alt="QR Code" className="max-w-full h-auto" />
+            <div className="text-center space-y-4">
+              <img 
+                src={outputValue} 
+                alt="QR Code" 
+                className="max-w-full h-auto mx-auto shadow-lg rounded-lg"
+                onError={(e) => {
+                  e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjNmNGY2Ii8+CjxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDAwIi8+CjxyZWN0IHg9IjYwIiB5PSIyMCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDAwIi8+CjxyZWN0IHg9IjEwMCIgeT0iMjAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iIzAwMCIvPgo8L3N2Zz4K';
+                  console.error('QR Code failed to load');
+                }}
+              />
+              <div className="text-sm text-gray-600">
+                <p>QR Code generated successfully</p>
+                <p className="text-xs mt-1">Right-click to save image</p>
+              </div>
+            </div>
           ) : (
             <div className="text-muted-foreground text-center">
-              <div className="text-6xl mb-2">📱</div>
-              <p>QR code will appear here</p>
+              <div className="text-6xl mb-4">📱</div>
+              <p className="text-lg font-medium">QR Code Preview</p>
+              <p className="text-sm mt-2">Enter text and click Convert to generate QR code</p>
             </div>
           )}
         </div>

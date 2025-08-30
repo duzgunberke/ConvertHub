@@ -276,13 +276,20 @@ export class QRCodeGeneratorConverter extends BaseConverter {
     }
   ];
 
-  async convert(input: string, options?: Record<string, any>): Promise<string> {
+  validate(input?: string) {
+    if (!input || input.trim().length === 0) {
+      return { valid: false, error: "Input text is required for QR code generation" };
+    }
+    return { valid: true };
+  }
+
+  async convert(input?: string, options?: Record<string, any>): Promise<string> {
     const text = encodeURIComponent(input || 'Hello World');
     const size = options?.size || 200;
     const errorLevel = options?.errorLevel || 'M';
     
-    // Using Google Charts API for QR generation (free service)
-    const qrUrl = `https://chart.googleapis.com/chart?chs=${size}x${size}&cht=qr&chl=${text}&choe=UTF-8&chld=${errorLevel}|0`;
+    // Using QR Server API (free service)
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${text}&ecc=${errorLevel}`;
     
     return qrUrl;
   }
