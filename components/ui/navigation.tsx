@@ -4,14 +4,24 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Home, Code2, Github } from 'lucide-react';
+import { Home, Code2, Github, BookText } from 'lucide-react';
 
 export function Navigation() {
   const pathname = usePathname();
 
   return (
     <nav className="fixed top-4 right-4 z-50 flex gap-2">
-      
+      <Button
+        variant="outline"
+        size="sm"
+        className="glass shadow-lg"
+        asChild
+      >
+        <Link href="/docs">
+          <BookText className="h-4 w-4 mr-2" />
+          API Docs
+        </Link>
+      </Button>
       <Button
         variant="outline"
         size="sm"
