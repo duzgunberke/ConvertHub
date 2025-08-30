@@ -29,24 +29,27 @@ export const CategorySidebar = ({
     new Set([selectedCategory.id])
   );
 
-  const toggleCategory = (categoryId: string) => {
-    const newExpanded = new Set(expandedCategories);
-    if (newExpanded.has(categoryId)) {
-      newExpanded.delete(categoryId);
-    } else {
-      newExpanded.add(categoryId);
-    }
-    setExpandedCategories(newExpanded);
-  };
-
   const handleCategorySelect = (category: Category) => {
-    onCategorySelect(category);
-    if (!expandedCategories.has(category.id)) {
-      toggleCategory(category.id);
-    }
-    // Select first converter in category
-    if (category.converters.length > 0) {
-      onConverterSelect(category.converters[0]);
+    if (selectedCategory.id === category.id) {
+      // If clicking on the already selected category, just toggle expansion
+      const newExpanded = new Set(expandedCategories);
+      if (newExpanded.has(category.id)) {
+        newExpanded.delete(category.id);
+      } else {
+        newExpanded.add(category.id);
+      }
+      setExpandedCategories(newExpanded);
+    } else {
+      // If clicking on a different category, select it and expand it
+      onCategorySelect(category);
+      const newExpanded = new Set(expandedCategories);
+      newExpanded.add(category.id);
+      setExpandedCategories(newExpanded);
+      
+      // Select first converter in category
+      if (category.converters.length > 0) {
+        onConverterSelect(category.converters[0]);
+      }
     }
   };
 
@@ -98,14 +101,14 @@ export const CategorySidebar = ({
                 return (
                   <div key={category.id} className="space-y-2">
                     {/* Category Header */}
-                    <div className="relative">
-                      <button
-                        onClick={() => handleCategorySelect(category)}
-                        className={cn(
-                          "w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-left group hover:bg-muted/60 hover:shadow-md",
-                          isSelected && "bg-primary/10 shadow-lg ring-1 ring-primary/20"
-                        )}
-                      >
+                    <button
+                      onClick={() => handleCategorySelect(category)}
+                      className={cn(
+                        "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 text-left group hover:bg-muted/60 hover:shadow-md",
+                        isSelected && "bg-primary/10 shadow-lg ring-1 ring-primary/20"
+                      )}
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
                         <span className="text-xl flex-shrink-0">{category.icon}</span>
                         <div className="flex-1 min-w-0">
                           <div className={cn(
@@ -118,29 +121,20 @@ export const CategorySidebar = ({
                             {category.converters.length} tools
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                            {category.converters.length}
-                          </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                          {category.converters.length}
+                        </Badge>
+                        <div className="h-6 w-6 flex items-center justify-center opacity-60">
+                          {isExpanded ? (
+                            <ChevronDown className="h-3 w-3" />
+                          ) : (
+                            <ChevronRight className="h-3 w-3" />
+                          )}
                         </div>
-                      </button>
-                      
-                      {/* Separate toggle button */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleCategory(category.id);
-                        }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center rounded-md hover:bg-muted/40 transition-colors opacity-60 hover:opacity-100"
-                      >
-                        {isExpanded ? (
-                          <ChevronDown className="h-3 w-3" />
-                        ) : (
-                          <ChevronRight className="h-3 w-3" />
-                        )}
-                      </button>
-                    </div>
+                      </div>
+                    </button>
 
                     {/* Converters List */}
                     {isExpanded && (
