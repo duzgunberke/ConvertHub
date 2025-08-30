@@ -3,6 +3,33 @@ import { NextRequest, NextResponse } from 'next/server';
 import { converterRegistry } from '@/lib/converter-registry';
 import { ConversionRequest, ConversionResponse } from '@/types/converter';
 
+/**
+ * @swagger
+ * /convert:
+ *   post:
+ *     tags: [Conversion]
+ *     summary: Convert text using specified converter
+ *     description: Converts input text using the specified converter
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ConversionRequest'
+ *     responses:
+ *       200:
+ *         description: Successful conversion
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ConversionResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
 export async function POST(request: NextRequest) {
   try {
     const body: ConversionRequest = await request.json();
@@ -47,6 +74,42 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * @swagger
+ * /convert:
+ *   get:
+ *     tags: [Conversion]
+ *     summary: Get all converters and statistics
+ *     description: Returns a list of all available converters with usage statistics
+ *     responses:
+ *       200:
+ *         description: List of converters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     stats:
+ *                       type: object
+ *                       properties:
+ *                         total:
+ *                           type: integer
+ *                         categories:
+ *                           type: integer
+ *                         byCategory:
+ *                           type: object
+ *                     converters:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/ConverterInfo'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
 export async function GET() {
   try {
     const stats = converterRegistry.getStats();
