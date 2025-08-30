@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-https://your-domain.com/api
+https://converthub.vercel.app/api
 # or for local development:
 http://localhost:3000/api
 ```
