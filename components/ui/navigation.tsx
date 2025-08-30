@@ -11,16 +11,6 @@ export function Navigation() {
 
   return (
     <nav className="fixed top-4 right-4 z-50 flex gap-2">
-      <Link href="/">
-        <Button
-          variant={pathname === '/' ? 'default' : 'outline'}
-          size="sm"
-          className="glass shadow-lg"
-        >
-          <Home className="h-4 w-4 mr-2" />
-          Convert
-        </Button>
-      </Link>
       
       <Button
         variant="outline"
