@@ -8,7 +8,7 @@ export default async function DocsPage() {
   const markdown = fs.readFileSync(readmePath, 'utf8');
 
   return (
-    <main className="prose mx-auto max-w-4xl py-8">
+    <main className="prose prose-invert mx-auto max-w-4xl py-8">
       <h1>ConvertHub API Documentation</h1>
       <ReactMarkdown>{markdown}</ReactMarkdown>
     </main>
