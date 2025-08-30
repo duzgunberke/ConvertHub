@@ -1,33 +1,70 @@
-# ConvertHub API Documentation
+# 🚀 ConvertHub API Documentation
 
-## Base URL
-```
+---
+
+## 📑 Table of Contents
+
+- [Base URL](#base-url)
+- [Overview](#overview)
+- [Authentication](#authentication)
+- [Rate Limiting](#rate-limiting)
+- [Endpoints](#endpoints)
+  - [Convert Text](#convert-text)
+  - [Convert with Specific Converter](#convert-with-specific-converter)
+  - [Get All Converters](#get-all-converters)
+  - [Get Specific Converter](#get-specific-converter)
+  - [Get Categories](#get-categories)
+  - [Search Converters](#search-converters)
+- [Converter Types & Examples](#converter-types--examples)
+- [Programming Language Examples](#programming-language-examples)
+- [Error Handling](#error-handling)
+- [Complete Converter List](#complete-converter-list)
+- [Tips & Best Practices](#tips--best-practices)
+
+---
+
+## 🌐 Base URL
+
+```txt
 https://converthub.vercel.app/api
 # or for local development:
 http://localhost:3000/api
 ```
 
-## Overview
+---
+
+## 📝 Overview
+
 ConvertHub API provides powerful text and data conversion operations. The API supports various converter types including text encoders, cryptographic hashers, generators, and advanced tools.
 
-## Authentication
+---
+
+## 🔒 Authentication
+
 Currently, the API is open and doesn't require authentication. All endpoints are publicly accessible.
 
-## Rate Limiting
-- 100 requests per minute per IP address
+---
+
+## 🚦 Rate Limiting
+
+- **100 requests per minute per IP address**
 - Larger inputs (>1MB) may have lower rate limits
 - No authentication required for current version
 
 ---
 
-# Endpoints
+# 🛠️ Endpoints
 
-## 1. Convert Text
+---
+
+## 1️⃣ Convert Text
 
 ### POST `/convert`
+
 Convert text using any supported converter.
 
-**Request Body:**
+#### Request Body
+
 ```json
 {
   "input": "Hello World",           // Optional for generators
@@ -39,7 +76,8 @@ Convert text using any supported converter.
 }
 ```
 
-**Response:**
+#### Response
+
 ```json
 {
   "success": true,
@@ -53,7 +91,8 @@ Convert text using any supported converter.
 }
 ```
 
-**Example cURL:**
+#### Example cURL
+
 ```bash
 curl -X POST http://localhost:3000/api/convert \
   -H "Content-Type: application/json" \
@@ -65,15 +104,18 @@ curl -X POST http://localhost:3000/api/convert \
 
 ---
 
-## 2. Convert with Specific Converter
+## 2️⃣ Convert with Specific Converter
 
 ### POST `/convert/{converterId}`
+
 Convert using a specific converter ID.
 
-**URL Parameters:**
+#### URL Parameters
+
 - `converterId` (string) - The ID of the converter to use
 
-**Request Body:**
+#### Request Body
+
 ```json
 {
   "input": "Hello World",    // Optional for generators
@@ -84,14 +126,16 @@ Convert using a specific converter ID.
 }
 ```
 
-**Example - UUID Generator:**
+#### Example - UUID Generator
+
 ```bash
 curl -X POST http://localhost:3000/api/convert/uuid-generate \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
 
-**Example - Password Generator:**
+#### Example - Password Generator
+
 ```bash
 curl -X POST http://localhost:3000/api/convert/password-generate \
   -H "Content-Type: application/json" \
@@ -105,7 +149,8 @@ curl -X POST http://localhost:3000/api/convert/password-generate \
   }'
 ```
 
-**Example - Base64 Encode:**
+#### Example - Base64 Encode
+
 ```bash
 curl -X POST http://localhost:3000/api/convert/base64-encode \
   -H "Content-Type: application/json" \
@@ -116,12 +161,14 @@ curl -X POST http://localhost:3000/api/convert/base64-encode \
 
 ---
 
-## 3. Get All Converters
+## 3️⃣ Get All Converters
 
 ### GET `/convert`
+
 Get a list of all available converters with statistics.
 
-**Response:**
+#### Response
+
 ```json
 {
   "success": true,
@@ -148,19 +195,22 @@ Get a list of all available converters with statistics.
 }
 ```
 
-**Example:**
+#### Example
+
 ```bash
 curl http://localhost:3000/api/convert
 ```
 
 ---
 
-## 4. Get Specific Converter
+## 4️⃣ Get Specific Converter
 
 ### GET `/convert/{converterId}`
+
 Get information about a specific converter.
 
-**Response:**
+#### Response
+
 ```json
 {
   "success": true,
@@ -174,19 +224,22 @@ Get information about a specific converter.
 }
 ```
 
-**Example:**
+#### Example
+
 ```bash
 curl http://localhost:3000/api/convert/base64-encode
 ```
 
 ---
 
-## 5. Get Categories
+## 5️⃣ Get Categories
 
 ### GET `/categories`
+
 Get all converter categories with their converters.
 
-**Response:**
+#### Response
+
 ```json
 {
   "success": true,
@@ -207,22 +260,26 @@ Get all converter categories with their converters.
 }
 ```
 
-**Example:**
+#### Example
+
 ```bash
 curl http://localhost:3000/api/categories
 ```
 
 ---
 
-## 6. Search Converters
+## 6️⃣ Search Converters
 
 ### GET `/search?q={query}`
+
 Search for converters by name, description, or tags.
 
-**Query Parameters:**
+#### Query Parameters
+
 - `q` (string) - Search query
 
-**Response:**
+#### Response
+
 ```json
 {
   "success": true,
@@ -242,162 +299,154 @@ Search for converters by name, description, or tags.
 }
 ```
 
-**Example:**
+#### Example
+
 ```bash
 curl "http://localhost:3000/api/search?q=base64"
 ```
 
 ---
 
-# Converter Types & Examples
+# 🧩 Converter Types & Examples
 
-## Text Encoding Converters
+## ✏️ Text Encoding Converters
 
-### Base64 Encode
-```bash
-curl -X POST http://localhost:3000/api/convert/base64-encode \
-  -H "Content-Type: application/json" \
-  -d '{"input": "Hello World"}'
-```
-
-### URL Encode  
-```bash
-curl -X POST http://localhost:3000/api/convert/url-encode \
-  -H "Content-Type: application/json" \
-  -d '{"input": "Hello World & Special Characters!"}'
-```
-
-### HTML Encode
-```bash
-curl -X POST http://localhost:3000/api/convert/html-encode \
-  -H "Content-Type: application/json" \
-  -d '{"input": "<script>alert(\"test\")</script>"}'
-```
+- **Base64 Encode**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/base64-encode \
+    -H "Content-Type: application/json" \
+    -d '{"input": "Hello World"}'
+  ```
+- **URL Encode**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/url-encode \
+    -H "Content-Type: application/json" \
+    -d '{"input": "Hello World & Special Characters!"}'
+  ```
+- **HTML Encode**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/html-encode \
+    -H "Content-Type: application/json" \
+    -d '{"input": "<script>alert(\"test\")</script>"}'
+  ```
 
 ---
 
-## Cryptography Converters
+## 🔐 Cryptography Converters
 
-### SHA256 Hash
-```bash
-curl -X POST http://localhost:3000/api/convert/hash-sha256 \
-  -H "Content-Type: application/json" \
-  -d '{"input": "Hello World"}'
-```
-
-### HMAC-SHA256
-```bash
-curl -X POST http://localhost:3000/api/convert/hmac-sha256 \
-  -H "Content-Type: application/json" \
-  -d '{"input": "Hello World\nmysecretkey"}'
-```
-
----
-
-## Generator Converters
-
-### UUID Generator
-```bash
-curl -X POST http://localhost:3000/api/convert/uuid-generate \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
-### Password Generator
-```bash
-curl -X POST http://localhost:3000/api/convert/password-generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "options": {
-      "length": 16,
-      "includeUppercase": true,
-      "includeLowercase": true, 
-      "includeNumbers": true,
-      "includeSymbols": true,
-      "excludeSimilar": false
-    }
-  }'
-```
-
-### QR Code Generator
-```bash
-curl -X POST http://localhost:3000/api/convert/qr-generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": "Hello World",
-    "options": {
-      "size": 200,
-      "errorLevel": "M"
-    }
-  }'
-```
-
-### Lorem Ipsum Generator
-```bash
-curl -X POST http://localhost:3000/api/convert/lorem-generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "options": {
-      "wordCount": 50
-    }
-  }'
-```
+- **SHA256 Hash**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/hash-sha256 \
+    -H "Content-Type: application/json" \
+    -d '{"input": "Hello World"}'
+  ```
+- **HMAC-SHA256**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/hmac-sha256 \
+    -H "Content-Type: application/json" \
+    -d '{"input": "Hello World\nmysecretkey"}'
+  ```
 
 ---
 
-## Advanced Tools
+## ⚡ Generator Converters
 
-### RegEx Tester
-```bash
-curl -X POST http://localhost:3000/api/convert/regex-test \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": "test@example.com\ninvalid-email\nuser@domain.org",
-    "options": {
-      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-      "flags": "gm",
-      "showMatches": true
-    }
-  }'
-```
-
-### SQL Formatter
-```bash
-curl -X POST http://localhost:3000/api/convert/sql-format \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": "select * from users where active=1 order by name",
-    "options": {
-      "uppercase": true
-    }
-  }'
-```
-
-### CSS Minifier
-```bash
-curl -X POST http://localhost:3000/api/convert/css-minify \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": ".container {\n  display: flex;\n  justify-content: center;\n}"
-  }'
-```
-
-### CSV to JSON
-```bash
-curl -X POST http://localhost:3000/api/convert/csv-to-json \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": "name,age,city\nJohn,30,New York\nJane,25,Los Angeles",
-    "options": {
-      "delimiter": ",",
-      "hasHeader": true
-    }
-  }'
-```
+- **UUID Generator**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/uuid-generate \
+    -H "Content-Type: application/json" \
+    -d '{}'
+  ```
+- **Password Generator**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/password-generate \
+    -H "Content-Type: application/json" \
+    -d '{
+      "options": {
+        "length": 16,
+        "includeUppercase": true,
+        "includeLowercase": true, 
+        "includeNumbers": true,
+        "includeSymbols": true,
+        "excludeSimilar": false
+      }
+    }'
+  ```
+- **QR Code Generator**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/qr-generate \
+    -H "Content-Type: application/json" \
+    -d '{
+      "input": "Hello World",
+      "options": {
+        "size": 200,
+        "errorLevel": "M"
+      }
+    }'
+  ```
+- **Lorem Ipsum Generator**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/lorem-generate \
+    -H "Content-Type: application/json" \
+    -d '{
+      "options": {
+        "wordCount": 50
+      }
+    }'
+  ```
 
 ---
 
-# Programming Language Examples
+## 🛠️ Advanced Tools
+
+- **RegEx Tester**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/regex-test \
+    -H "Content-Type: application/json" \
+    -d '{
+      "input": "test@example.com\ninvalid-email\nuser@domain.org",
+      "options": {
+        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "flags": "gm",
+        "showMatches": true
+      }
+    }'
+  ```
+- **SQL Formatter**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/sql-format \
+    -H "Content-Type: application/json" \
+    -d '{
+      "input": "select * from users where active=1 order by name",
+      "options": {
+        "uppercase": true
+      }
+    }'
+  ```
+- **CSS Minifier**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/css-minify \
+    -H "Content-Type: application/json" \
+    -d '{
+      "input": ".container {\n  display: flex;\n  justify-content: center;\n}"
+    }'
+  ```
+- **CSV to JSON**
+  ```bash
+  curl -X POST http://localhost:3000/api/convert/csv-to-json \
+    -H "Content-Type: application/json" \
+    -d '{
+      "input": "name,age,city\nJohn,30,New York\nJane,25,Los Angeles",
+      "options": {
+        "delimiter": ",",
+        "hasHeader": true
+      }
+    }'
+  ```
+
+---
+
+# 💻 Programming Language Examples
 
 ## JavaScript/Node.js
 
@@ -565,9 +614,10 @@ echo $api->generatePassword(20) . "\n";
 
 ---
 
-# Error Handling
+# ⚠️ Error Handling
 
 ## Error Response Format
+
 ```json
 {
   "success": false,
@@ -591,6 +641,7 @@ echo $api->generatePassword(20) . "\n";
 ## Common Errors
 
 ### Missing Input for Text Converters
+
 ```json
 {
   "success": false,
@@ -599,6 +650,7 @@ echo $api->generatePassword(20) . "\n";
 ```
 
 ### Invalid Converter ID
+
 ```json
 {
   "success": false,
@@ -607,6 +659,7 @@ echo $api->generatePassword(20) . "\n";
 ```
 
 ### Validation Error
+
 ```json
 {
   "success": false,
@@ -616,7 +669,7 @@ echo $api->generatePassword(20) . "\n";
 
 ---
 
-# Complete Converter List
+# 📋 Complete Converter List
 
 ## Text & Encoding (12)
 - `base64-encode` / `base64-decode`
@@ -658,7 +711,7 @@ echo $api->generatePassword(20) . "\n";
 
 ---
 
-# Tips & Best Practices
+# 💡 Tips & Best Practices
 
 1. **Always check the `success` field** in responses before using output
 2. **Handle errors gracefully** - validate inputs client-side when possible
@@ -667,3 +720,5 @@ echo $api->generatePassword(20) . "\n";
 5. **For regex testing**, escape backslashes in JSON (`\\` for `\`)
 6. **QR codes return image URLs** - fetch the URL to display the image
 7. **Large inputs** may take longer - implement timeout handling
+
+---
