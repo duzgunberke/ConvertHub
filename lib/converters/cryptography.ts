@@ -95,9 +95,13 @@ export class BCryptHashConverter extends BaseConverter {
   tags = ['bcrypt', 'hash', 'password'];
 
   async convert(input: string, options?: { rounds?: number }): Promise<string> {
-    const bcrypt = require('bcryptjs');
-    const saltRounds = options?.rounds || 12;
-    
-    return bcrypt.hash(input, saltRounds);
+    try {
+      const bcrypt = await import('bcryptjs');
+      const saltRounds = options?.rounds || 12;
+      
+      return bcrypt.default.hash(input, saltRounds);
+    } catch (error) {
+      throw new Error('BCrypt library not available. Please install bcryptjs package.');
+    }
   }
 }

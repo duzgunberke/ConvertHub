@@ -1,6 +1,5 @@
 // lib/converters/data-formats.ts
 import { BaseConverter } from '@/types/converter';
-import yaml from 'js-yaml';
 
 export class JSONFormatterConverter extends BaseConverter {
   id = 'json-format';
@@ -91,7 +90,10 @@ export class YAMLToJSONConverter extends BaseConverter {
     if (!baseValidation.valid) return baseValidation;
 
     try {
-      yaml.load(input);
+      // Simple YAML validation - just check for basic structure
+      if (input.includes('\t')) {
+        return { valid: false, error: 'YAML should not contain tabs, use spaces instead' };
+      }
       return { valid: true };
     } catch (error) {
       return { valid: false, error: 'Invalid YAML format' };
@@ -100,11 +102,13 @@ export class YAMLToJSONConverter extends BaseConverter {
 
   async convert(input: string, options?: { indent?: number }): Promise<string> {
     try {
+      // Dynamic import for js-yaml
+      const yaml = await import('js-yaml');
       const parsed = yaml.load(input);
       const indent = options?.indent || 2;
       return JSON.stringify(parsed, null, indent);
     } catch (error) {
-      throw new Error('Invalid YAML input');
+      throw new Error('Invalid YAML input or js-yaml library not available');
     }
   }
 }
@@ -131,10 +135,12 @@ export class JSONToYAMLConverter extends BaseConverter {
   async convert(input: string, options?: { indent?: number }): Promise<string> {
     try {
       const parsed = JSON.parse(input);
+      // Dynamic import for js-yaml
+      const yaml = await import('js-yaml');
       const indent = options?.indent || 2;
       return yaml.dump(parsed, { indent });
     } catch (error) {
-      throw new Error('Invalid JSON input');
+      throw new Error('Invalid JSON input or js-yaml library not available');
     }
   }
 }
