@@ -26,7 +26,7 @@ export function Navigation() {
         variant="outline"
         size="sm"
         className="glass shadow-lg"
-        onClick={() => window.open('https://github.com/your-username/converthub', '_blank')}
+        onClick={() => window.open('https://github.com/duzgunberke/converthub', '_blank')}
       >
         <Github className="h-4 w-4 mr-2" />
         GitHub
