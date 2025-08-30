@@ -176,8 +176,8 @@ export const CategorySidebar = ({
           {/* Footer */}
           <div className="p-4 border-t border-border/50 bg-gradient-to-r from-secondary/20 to-accent/10">
             <div className="text-center">
-              <div className="text-sm font-medium text-foreground/80">200+ conversion tools</div>
-              <div className="text-xs text-primary font-semibold mt-1">Professional Edition</div>
+              <div className="text-sm font-medium text-foreground/80">Powered by Berke</div>
+              <div className="text-xs text-primary font-semibold mt-1">Made with ❤️ in Turkey</div>
             </div>
           </div>
         </div>
