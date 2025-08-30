@@ -2,27 +2,6 @@
 
 ---
 
-## 📑 Table of Contents
-
-- [Base URL](#base-url)
-- [Overview](#overview)
-- [Authentication](#authentication)
-- [Rate Limiting](#rate-limiting)
-- [Endpoints](#endpoints)
-  - [Convert Text](#convert-text)
-  - [Convert with Specific Converter](#convert-with-specific-converter)
-  - [Get All Converters](#get-all-converters)
-  - [Get Specific Converter](#get-specific-converter)
-  - [Get Categories](#get-categories)
-  - [Search Converters](#search-converters)
-- [Converter Types & Examples](#converter-types--examples)
-- [Programming Language Examples](#programming-language-examples)
-- [Error Handling](#error-handling)
-- [Complete Converter List](#complete-converter-list)
-- [Tips & Best Practices](#tips--best-practices)
-
----
-
 ## 🌐 Base URL
 
 ```txt
