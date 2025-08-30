@@ -3,18 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { converterRegistry } from '@/lib/converter-registry';
 import { ConversionRequest } from '@/types/converter';
 
-interface RouteContext {
-  params: {
-    converterId: string;
-  };
-}
-
 export async function POST(
   request: NextRequest, 
-  context: RouteContext
+  { params }: { params: { converterId: string } }
 ) {
   try {
-    const { converterId } = context.params;
+    const { converterId } = params;
     const body = await request.json();
     
     // Validate request
@@ -49,7 +43,7 @@ export async function POST(
     return NextResponse.json(result, { status });
     
   } catch (error) {
-    console.error(`Conversion API error for ${context.params.converterId}:`, error);
+    console.error(`Conversion API error for ${params.converterId}:`, error);
     
     return NextResponse.json({
       success: false,
@@ -60,10 +54,10 @@ export async function POST(
 
 export async function GET(
   request: NextRequest, 
-  context: RouteContext
+  { params }: { params: { converterId: string } }
 ) {
   try {
-    const { converterId } = context.params;
+    const { converterId } = params;
     
     // Get converter
     const converter = converterRegistry.get(converterId);
@@ -86,7 +80,7 @@ export async function GET(
     });
     
   } catch (error) {
-    console.error(`Get converter API error for ${context.params.converterId}:`, error);
+    console.error(`Get converter API error for ${params.converterId}:`, error);
     
     return NextResponse.json({
       success: false,
