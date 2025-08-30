@@ -1,4 +1,4 @@
-// app/api/convert/[converterId]/route.ts - Fixed version
+// app/api/convert/[converterId]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { converterRegistry } from '@/lib/converter-registry';
 import { ConversionRequest } from '@/types/converter';
@@ -46,8 +46,8 @@ export async function POST(
     return NextResponse.json(result, { status });
     
   } catch (error) {
-    const { converterId } = await context.params;
-    console.error(`Conversion API error for ${converterId}:`, error);
+    const params = await context.params;
+    console.error(`Conversion API error for ${params.converterId}:`, error);
     
     return NextResponse.json({
       success: false,
@@ -84,8 +84,8 @@ export async function GET(
     });
     
   } catch (error) {
-    const { converterId } = await context.params;
-    console.error(`Get converter API error for ${converterId}:`, error);
+    const params = await context.params;
+    console.error(`Get converter API error for ${params.converterId}:`, error);
     
     return NextResponse.json({
       success: false,

@@ -1,4 +1,4 @@
-// lib/converters/all-converters.ts
+// lib/converters/all-converters.ts - Updated existing converters
 import { BaseConverter } from '@/types/converter';
 import crypto from 'crypto';
 
@@ -10,9 +10,10 @@ export class Base64EncodeConverter extends BaseConverter {
   description = 'Encode text to Base64 format';
   category = 'text-encoding';
   tags = ['base64', 'encode', 'text'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return Buffer.from(input, 'utf8').toString('base64');
+  async convert(input?: string): Promise<string> {
+    return Buffer.from(input || '', 'utf8').toString('base64');
   }
 }
 
@@ -22,20 +23,21 @@ export class Base64DecodeConverter extends BaseConverter {
   description = 'Decode Base64 to text';
   category = 'text-encoding';
   tags = ['base64', 'decode', 'text'];
+  inputType = 'text' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
     const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
-    if (!base64Regex.test(input.replace(/\s/g, ''))) {
+    if (!base64Regex.test((input || '').replace(/\s/g, ''))) {
       return { valid: false, error: 'Invalid Base64 format' };
     }
     return { valid: true };
   }
 
-  async convert(input: string): Promise<string> {
-    return Buffer.from(input, 'base64').toString('utf8');
+  async convert(input?: string): Promise<string> {
+    return Buffer.from(input || '', 'base64').toString('utf8');
   }
 }
 
@@ -45,9 +47,10 @@ export class URLEncodeConverter extends BaseConverter {
   description = 'Encode text for URL usage';
   category = 'text-encoding';
   tags = ['url', 'encode', 'web'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return encodeURIComponent(input);
+  async convert(input?: string): Promise<string> {
+    return encodeURIComponent(input || '');
   }
 }
 
@@ -57,9 +60,10 @@ export class URLDecodeConverter extends BaseConverter {
   description = 'Decode URL encoded text';
   category = 'text-encoding';
   tags = ['url', 'decode', 'web'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return decodeURIComponent(input);
+  async convert(input?: string): Promise<string> {
+    return decodeURIComponent(input || '');
   }
 }
 
@@ -69,8 +73,9 @@ export class HTMLEncodeConverter extends BaseConverter {
   description = 'Encode special HTML characters';
   category = 'text-encoding';
   tags = ['html', 'encode', 'web'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
+  async convert(input?: string): Promise<string> {
     const entities: { [key: string]: string } = {
       '&': '&amp;',
       '<': '&lt;',
@@ -79,7 +84,7 @@ export class HTMLEncodeConverter extends BaseConverter {
       "'": '&#x27;',
       '/': '&#x2F;',
     };
-    return input.replace(/[&<>"'/]/g, (match) => entities[match]);
+    return (input || '').replace(/[&<>"'/]/g, (match) => entities[match]);
   }
 }
 
@@ -89,8 +94,9 @@ export class HTMLDecodeConverter extends BaseConverter {
   description = 'Decode HTML entities';
   category = 'text-encoding';
   tags = ['html', 'decode', 'web'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
+  async convert(input?: string): Promise<string> {
     const entities: { [key: string]: string } = {
       '&amp;': '&',
       '&lt;': '<',
@@ -100,7 +106,7 @@ export class HTMLDecodeConverter extends BaseConverter {
       '&#x2F;': '/',
       '&apos;': "'",
     };
-    return input.replace(/&(?:amp|lt|gt|quot|#x27|#x2F|apos);/g, (match) => entities[match] || match);
+    return (input || '').replace(/&(?:amp|lt|gt|quot|#x27|#x2F|apos);/g, (match) => entities[match] || match);
   }
 }
 
@@ -110,9 +116,10 @@ export class TextUppercaseConverter extends BaseConverter {
   description = 'Convert text to uppercase';
   category = 'text-encoding';
   tags = ['text', 'uppercase', 'case'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return input.toUpperCase();
+  async convert(input?: string): Promise<string> {
+    return (input || '').toUpperCase();
   }
 }
 
@@ -122,9 +129,10 @@ export class TextLowercaseConverter extends BaseConverter {
   description = 'Convert text to lowercase';
   category = 'text-encoding';
   tags = ['text', 'lowercase', 'case'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return input.toLowerCase();
+  async convert(input?: string): Promise<string> {
+    return (input || '').toLowerCase();
   }
 }
 
@@ -134,9 +142,10 @@ export class TextCapitalizeConverter extends BaseConverter {
   description = 'Capitalize first letter of each word';
   category = 'text-encoding';
   tags = ['text', 'capitalize', 'case'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return input.replace(/\w\S*/g, (txt) => 
+  async convert(input?: string): Promise<string> {
+    return (input || '').replace(/\w\S*/g, (txt) => 
       txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
     );
   }
@@ -148,9 +157,10 @@ export class TextReverseConverter extends BaseConverter {
   description = 'Reverse text characters';
   category = 'text-encoding';
   tags = ['text', 'reverse'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return input.split('').reverse().join('');
+  async convert(input?: string): Promise<string> {
+    return (input || '').split('').reverse().join('');
   }
 }
 
@@ -162,9 +172,10 @@ export class MD5HashConverter extends BaseConverter {
   description = 'Generate MD5 hash';
   category = 'cryptography';
   tags = ['hash', 'md5', 'crypto'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return crypto.createHash('md5').update(input).digest('hex');
+  async convert(input?: string): Promise<string> {
+    return crypto.createHash('md5').update(input || '').digest('hex');
   }
 }
 
@@ -174,9 +185,10 @@ export class SHA1HashConverter extends BaseConverter {
   description = 'Generate SHA1 hash';
   category = 'cryptography';
   tags = ['hash', 'sha1', 'crypto'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return crypto.createHash('sha1').update(input).digest('hex');
+  async convert(input?: string): Promise<string> {
+    return crypto.createHash('sha1').update(input || '').digest('hex');
   }
 }
 
@@ -186,9 +198,10 @@ export class SHA256HashConverter extends BaseConverter {
   description = 'Generate SHA256 hash';
   category = 'cryptography';
   tags = ['hash', 'sha256', 'crypto'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return crypto.createHash('sha256').update(input).digest('hex');
+  async convert(input?: string): Promise<string> {
+    return crypto.createHash('sha256').update(input || '').digest('hex');
   }
 }
 
@@ -198,9 +211,10 @@ export class SHA512HashConverter extends BaseConverter {
   description = 'Generate SHA512 hash';
   category = 'cryptography';
   tags = ['hash', 'sha512', 'crypto'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    return crypto.createHash('sha512').update(input).digest('hex');
+  async convert(input?: string): Promise<string> {
+    return crypto.createHash('sha512').update(input || '').digest('hex');
   }
 }
 
@@ -210,20 +224,21 @@ export class HMACConverter extends BaseConverter {
   description = 'Generate HMAC with secret key (input|key on separate lines)';
   category = 'cryptography';
   tags = ['hmac', 'hash', 'crypto'];
+  inputType = 'multiline' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
-    const lines = input.split('\n');
+    const lines = (input || '').split('\n');
     if (lines.length < 2) {
       return { valid: false, error: 'Format: text on first line, secret key on second line' };
     }
     return { valid: true };
   }
 
-  async convert(input: string): Promise<string> {
-    const lines = input.split('\n');
+  async convert(input?: string): Promise<string> {
+    const lines = (input || '').split('\n');
     const text = lines[0];
     const key = lines[1];
     return crypto.createHmac('sha256', key).update(text).digest('hex');
@@ -238,19 +253,20 @@ export class DecimalToBinaryConverter extends BaseConverter {
   description = 'Convert decimal numbers to binary';
   category = 'numbers-math';
   tags = ['decimal', 'binary', 'conversion'];
+  inputType = 'text' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
-    if (!/^\d+$/.test(input.trim())) {
+    if (!/^\d+$/.test((input || '').trim())) {
       return { valid: false, error: 'Input must be a valid decimal number' };
     }
     return { valid: true };
   }
 
-  async convert(input: string): Promise<string> {
-    return parseInt(input.trim()).toString(2);
+  async convert(input?: string): Promise<string> {
+    return parseInt((input || '').trim()).toString(2);
   }
 }
 
@@ -260,19 +276,20 @@ export class BinaryToDecimalConverter extends BaseConverter {
   description = 'Convert binary numbers to decimal';
   category = 'numbers-math';
   tags = ['binary', 'decimal', 'conversion'];
+  inputType = 'text' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
-    if (!/^[01]+$/.test(input.trim())) {
+    if (!/^[01]+$/.test((input || '').trim())) {
       return { valid: false, error: 'Input must contain only 0s and 1s' };
     }
     return { valid: true };
   }
 
-  async convert(input: string): Promise<string> {
-    return parseInt(input.trim(), 2).toString();
+  async convert(input?: string): Promise<string> {
+    return parseInt((input || '').trim(), 2).toString();
   }
 }
 
@@ -282,19 +299,20 @@ export class DecimalToHexConverter extends BaseConverter {
   description = 'Convert decimal numbers to hexadecimal';
   category = 'numbers-math';
   tags = ['decimal', 'hex', 'conversion'];
+  inputType = 'text' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
-    if (!/^\d+$/.test(input.trim())) {
+    if (!/^\d+$/.test((input || '').trim())) {
       return { valid: false, error: 'Input must be a valid decimal number' };
     }
     return { valid: true };
   }
 
-  async convert(input: string): Promise<string> {
-    return parseInt(input.trim()).toString(16).toUpperCase();
+  async convert(input?: string): Promise<string> {
+    return parseInt((input || '').trim()).toString(16).toUpperCase();
   }
 }
 
@@ -304,19 +322,20 @@ export class HexToDecimalConverter extends BaseConverter {
   description = 'Convert hexadecimal to decimal';
   category = 'numbers-math';
   tags = ['hex', 'decimal', 'conversion'];
+  inputType = 'text' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
-    if (!/^[0-9A-Fa-f]+$/.test(input.trim())) {
+    if (!/^[0-9A-Fa-f]+$/.test((input || '').trim())) {
       return { valid: false, error: 'Input must be valid hexadecimal (0-9, A-F)' };
     }
     return { valid: true };
   }
 
-  async convert(input: string): Promise<string> {
-    return parseInt(input.trim(), 16).toString();
+  async convert(input?: string): Promise<string> {
+    return parseInt((input || '').trim(), 16).toString();
   }
 }
 
@@ -328,20 +347,21 @@ export class HexToRGBConverter extends BaseConverter {
   description = 'Convert hex colors to RGB';
   category = 'colors-design';
   tags = ['color', 'hex', 'rgb'];
+  inputType = 'text' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
-    const hex = input.trim().replace('#', '');
+    const hex = (input || '').trim().replace('#', '');
     if (!/^[0-9A-Fa-f]{6}$/.test(hex) && !/^[0-9A-Fa-f]{3}$/.test(hex)) {
       return { valid: false, error: 'Invalid hex color format (use #RRGGBB or #RGB)' };
     }
     return { valid: true };
   }
 
-  async convert(input: string): Promise<string> {
-    let hex = input.trim().replace('#', '');
+  async convert(input?: string): Promise<string> {
+    let hex = (input || '').trim().replace('#', '');
     
     if (hex.length === 3) {
       hex = hex.split('').map(h => h + h).join('');
@@ -361,20 +381,21 @@ export class RGBToHexConverter extends BaseConverter {
   description = 'Convert RGB colors to hex';
   category = 'colors-design';
   tags = ['color', 'rgb', 'hex'];
+  inputType = 'text' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
     const rgbRegex = /^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i;
-    if (!rgbRegex.test(input.trim())) {
+    if (!rgbRegex.test((input || '').trim())) {
       return { valid: false, error: 'Invalid RGB format (use rgb(r, g, b))' };
     }
     return { valid: true };
   }
 
-  async convert(input: string): Promise<string> {
-    const match = input.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+  async convert(input?: string): Promise<string> {
+    const match = (input || '').match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
     if (!match) throw new Error('Invalid RGB format');
     
     const r = parseInt(match[1]);
@@ -395,19 +416,20 @@ export class TimestampToDateConverter extends BaseConverter {
   description = 'Convert Unix timestamp to human readable date';
   category = 'time-date';
   tags = ['timestamp', 'date', 'unix'];
+  inputType = 'text' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
-    if (!/^\d+$/.test(input.trim())) {
+    if (!/^\d+$/.test((input || '').trim())) {
       return { valid: false, error: 'Input must be a valid Unix timestamp' };
     }
     return { valid: true };
   }
 
-  async convert(input: string): Promise<string> {
-    const timestamp = parseInt(input.trim());
+  async convert(input?: string): Promise<string> {
+    const timestamp = parseInt((input || '').trim());
     const date = new Date(timestamp * 1000);
     return date.toISOString() + '\n' + date.toLocaleString();
   }
@@ -419,9 +441,10 @@ export class DateToTimestampConverter extends BaseConverter {
   description = 'Convert date to Unix timestamp';
   category = 'time-date';
   tags = ['date', 'timestamp', 'unix'];
+  inputType = 'text' as const;
 
-  async convert(input: string): Promise<string> {
-    const date = new Date(input.trim());
+  async convert(input?: string): Promise<string> {
+    const date = new Date((input || '').trim());
     if (isNaN(date.getTime())) {
       throw new Error('Invalid date format');
     }
@@ -437,21 +460,22 @@ export class JSONFormatterConverter extends BaseConverter {
   description = 'Format and validate JSON';
   category = 'data-formats';
   tags = ['json', 'format', 'validate'];
+  inputType = 'json' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
     try {
-      JSON.parse(input);
+      JSON.parse(input || '');
       return { valid: true };
     } catch (error) {
       return { valid: false, error: 'Invalid JSON format' };
     }
   }
 
-  async convert(input: string, options?: { indent?: number }): Promise<string> {
-    const parsed = JSON.parse(input);
+  async convert(input?: string, options?: { indent?: number }): Promise<string> {
+    const parsed = JSON.parse(input || '');
     const indent = options?.indent || 2;
     return JSON.stringify(parsed, null, indent);
   }
@@ -463,21 +487,22 @@ export class JSONMinifyConverter extends BaseConverter {
   description = 'Minify JSON by removing whitespace';
   category = 'data-formats';
   tags = ['json', 'minify', 'compress'];
+  inputType = 'json' as const;
 
-  validate(input: string) {
+  validate(input?: string) {
     const base = super.validate(input);
     if (!base.valid) return base;
     
     try {
-      JSON.parse(input);
+      JSON.parse(input || '');
       return { valid: true };
     } catch (error) {
       return { valid: false, error: 'Invalid JSON format' };
     }
   }
 
-  async convert(input: string): Promise<string> {
-    const parsed = JSON.parse(input);
+  async convert(input?: string): Promise<string> {
+    const parsed = JSON.parse(input || '');
     return JSON.stringify(parsed);
   }
 }
@@ -490,42 +515,35 @@ export class UUIDGeneratorConverter extends BaseConverter {
   description = 'Generate UUID v4 (ignores input)';
   category = 'generators';
   tags = ['uuid', 'generate', 'unique'];
+  inputType = 'generator' as const;
 
-  async convert(input: string): Promise<string> {
+  async convert(input?: string): Promise<string> {
     return crypto.randomUUID();
-  }
-}
-
-export class PasswordGeneratorConverter extends BaseConverter {
-  id = 'password-generate';
-  name = 'Password Generator';
-  description = 'Generate secure password (input = length, default 12)';
-  category = 'generators';
-  tags = ['password', 'generate', 'secure'];
-
-  async convert(input: string): Promise<string> {
-    const length = parseInt(input.trim()) || 12;
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    let password = '';
-    
-    for (let i = 0; i < length; i++) {
-      const randomIndex = crypto.randomInt(0, chars.length);
-      password += chars[randomIndex];
-    }
-    
-    return password;
   }
 }
 
 export class LoremGeneratorConverter extends BaseConverter {
   id = 'lorem-generate';
   name = 'Lorem Ipsum Generator';
-  description = 'Generate Lorem Ipsum text (input = word count, default 50)';
+  description = 'Generate Lorem Ipsum text';
   category = 'generators';
   tags = ['lorem', 'ipsum', 'placeholder'];
+  inputType = 'generator' as const;
+  
+  inputFields = [
+    {
+      name: 'wordCount',
+      label: 'Word Count',
+      type: 'range' as const,
+      defaultValue: 50,
+      min: 10,
+      max: 500,
+      description: 'Number of words to generate'
+    }
+  ];
 
-  async convert(input: string): Promise<string> {
-    const wordCount = parseInt(input.trim()) || 50;
+  async convert(input?: string, options?: Record<string, any>): Promise<string> {
+    const wordCount = options?.wordCount || 50;
     const words = [
       'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit',
       'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',

@@ -1,4 +1,4 @@
-// app/api/convert/route.ts - Fixed version
+// app/api/convert/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { converterRegistry } from '@/lib/converter-registry';
 import { ConversionRequest, ConversionResponse } from '@/types/converter';
@@ -7,6 +7,14 @@ export async function POST(request: NextRequest) {
   try {
     const body: ConversionRequest = await request.json();
     
+    // Validate converterId is provided
+    if (!body.converterId) {
+      return NextResponse.json({
+        success: false,
+        error: 'Missing required field: converterId'
+      }, { status: 400 });
+    }
+
     // Get converter first to check its type
     const converter = converterRegistry.get(body.converterId);
     if (!converter) {
